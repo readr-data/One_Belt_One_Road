@@ -1,0 +1,172 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+#這篇專門for情緒分析
+```{r}
+library(data.table)
+library(bigreadr)
+library(tidyr)
+library(dplyr)
+library(plyr)
+```
+```{r}
+# 開一個新欄位 a ，把 ai 欄位的資料做分類
+all$a <- ifelse(grepl("是正面的|被視為正面|持正面情绪", all$ai, ignore.case = TRUE), "是正面的",
+         ifelse(grepl("是負面的|是负面的|被視為負面|被視為负面|持负面情绪", all$ai, ignore.case = TRUE), "是負面的",
+         ifelse(grepl("無法確定|很難確定|無法直接判斷|无法直接访问|閱讀文章", all$ai, ignore.case = TRUE), "無法辨識", "是中性的")))
+
+
+yes <-filter(all,a=="是正面的")
+no <-filter(all,a=="是負面的"|a=="是负面的")
+middle <-filter(all,a=="是中性的")
+wait<-filter(all,a=="無法辨識")
+
+```
+
+```{r}
+#正面國家 top10
+yes_country<-ddply(yes,.(country),summarize,count=length(country))
+all_country<-ddply(all,.(country),summarize,count=length(country))
+colnames(all_country)[2] <- 'all_count'
+yes_country<-merge(yes_country,all_country)
+yes_country$percentage <- paste(round((yes_country$count / yes_country$all_count) * 100, 2), "%", sep = "")
+
+yes_korea<-filter(yes,country=="韓國")
+yes_thai<-filter(yes,country=="泰國")
+yes_egypt<-filter(yes,country=="埃及")
+yes_phil<-filter(yes,country=="菲律賓")
+yes_viet<-filter(yes,country=="越南")
+yes_myanmar<-filter(yes,country=="緬甸")
+yes_russia<-filter(yes,country=="俄羅斯")
+yes_sing<-filter(yes,country=="新加坡")
+yes_syria<-filter(yes,country=="敘利亞")
+yes_italy<-filter(yes,country=="義大利")
+
+write.csv(yes_korea, "yes_korea.csv", row.names = FALSE)
+write.csv(yes_thai, "yes_thai.csv", row.names = FALSE)
+write.csv(yes_egypt, "yes_egypt.csv", row.names = FALSE)
+write.csv(yes_phil, "yes_phil.csv", row.names = FALSE)
+write.csv(yes_viet, "yes_viet.csv", row.names = FALSE)
+write.csv(yes_myanmar, "yes_myanmar.csv", row.names = FALSE)
+write.csv(yes_russia, "yes_russia.csv", row.names = FALSE)
+write.csv(yes_sing, "yes_sing.csv", row.names = FALSE)
+write.csv(yes_syria, "yes_syria.csv", row.names = FALSE)
+write.csv(yes_italy, "yes_italy.csv", row.names = FALSE)
+
+#負面國家top10
+no_country<-ddply(no,.(country),summarize,count=length(country))
+no_country<-merge(no_country,all_country)
+no_country$percentage <- paste(round((no_country$count / no_country$all_count) * 100, 2), "%", sep = "")
+
+yes_korea<-filter(yes,country=="韓國")
+yes_thai<-filter(yes,country=="泰國")
+yes_egypt<-filter(yes,country=="埃及")
+yes_phil<-filter(yes,country=="菲律賓")
+yes_viet<-filter(yes,country=="越南")
+yes_myanmar<-filter(yes,country=="緬甸")
+yes_russia<-filter(yes,country=="俄羅斯")
+yes_sing<-filter(yes,country=="新加坡")
+yes_syria<-filter(yes,country=="敘利亞")
+yes_italy<-filter(yes,country=="義大利")
+
+write.csv(yes_korea, "yes_korea.csv", row.names = FALSE)
+write.csv(yes_thai, "yes_thai.csv", row.names = FALSE)
+write.csv(yes_egypt, "yes_egypt.csv", row.names = FALSE)
+write.csv(yes_phil, "yes_phil.csv", row.names = FALSE)
+write.csv(yes_viet, "yes_viet.csv", row.names = FALSE)
+write.csv(yes_myanmar, "yes_myanmar.csv", row.names = FALSE)
+write.csv(yes_russia, "yes_russia.csv", row.names = FALSE)
+write.csv(yes_sing, "yes_sing.csv", row.names = FALSE)
+write.csv(yes_syria, "yes_syria.csv", row.names = FALSE)
+write.csv(yes_italy, "yes_italy.csv", row.names = FALSE)
+```
+
+```{r}
+#刪去「無法辨識」資料中，含有網址的內容
+wait$message_zh <- gsub("^http://.*$", "", wait$message_zh)
+wait$message_zh <- gsub("^https://.*$", "", wait$message_zh)
+write.csv(wait, "wait.csv", row.names = FALSE)
+
+#無法辨識的貼文重新跑完 python 情緒分析後，再放回來分類
+wait_ai$a=NULL
+
+wait_ai$a <- ifelse(grepl("是正面的|被視為正面|持正面情绪", wait_ai$ai, ignore.case = TRUE), "是正面的",
+         ifelse(grepl("是負面的|是负面的|被視為負面|被視為负面|持负面情绪", wait_ai$ai, ignore.case = TRUE), "是負面的",
+         ifelse(grepl("無法確定|很難確定|無法直接判斷|无法直接访问|閱讀文章", wait_ai$ai, ignore.case = TRUE), "無法辨識", "是中性的")))
+
+yes_s <-filter(wait_ai,a=="是正面的")
+no_s <-filter(wait_ai,a=="是負面的"|a=="是负面的")
+middle_s <-filter(wait_ai,a=="是中性的")
+wait_s<-filter(wait_ai,a=="無法辨識")
+
+yes<-rbind(yes,yes_s)
+no<-rbind(no,no_s)
+middle<-rbind(middle,middle_s)
+
+```
+
+#標記出中國國營媒體的報導，在正面情緒的比例上予以排除
+```{r}
+library(RSelenium)
+library(rvest)
+library(dplyr)
+library(data.table)
+library(magrittr)
+```
+
+```{r}
+cd /Users/mac/Downloads
+java -jar selenium-server-standalone-3.141.59.jar 
+```
+
+# selenium 設定
+```{r}
+remDr <- remoteDriver(
+  remoteServerAddr = "localhost",
+  port = 4444,
+  browserName = "chrome")
+```
+
+##這裡是需要協助的地方
+```{r}
+
+#原本的ｃｏｄｅ
+##定义函数来检查贴文是否包含指定文字
+check_for_keyword <- function(url, keyword) {
+  remDr$navigate(url)
+  Sys.sleep(2)  # 等待页面加载，可能需要调整等待时间
+  page_source <- remDr$getPageSource()[[1]]
+  soup <- read_html(page_source)
+  post_content <- html_nodes(soup, ".post_content")  # 请确保正确选择贴文内容的 HTML 元素
+
+  if (length(post_content) > 0 && keyword %in% html_text(post_content)) {
+    return('y')
+  } else {
+    return('n')
+  }
+}
+
+# 定义要检查的关键字
+keyword_to_check <- '中國國營媒體'
+
+# 新增空白列 'a' 到 DataFrame
+yes <- yes %>% mutate(a = "")
+
+# 循环处理每个 URL
+for (i in 1:10) {
+  url <- yes[i, 'url']
+  result <- check_for_keyword(url, keyword_to_check)
+  yes[i, 'a'] <- result
+  cat("Processing record ", i, "\n")
+}
+
+# 关闭 WebDriver
+remDr$close()
+
+```
+
+
+
+```
+
