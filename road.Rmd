@@ -1,0 +1,2791 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+---
+title: "R Notebook"
+---
+```{r}
+library(data.table)
+library(bigreadr)
+library(tidyr)
+library(dplyr)
+library(plyr)
+```
+#大包的資料分割成五小包
+```{r}
+#新增一個空的列表，用於儲存分割後的小包
+small_dfs <- list()
+
+# 每個小包的筆數
+chunk_size <- 10000
+
+# 計算總共需要多少小包
+num_chunks <- ceiling(nrow(vietnam) / chunk_size)
+
+# 循環分割
+for (i in 1:num_chunks) {
+  # 計算當前小包的起始和结束列數
+  start_row <- (i - 1) * chunk_size + 1
+  end_row <- min(i * chunk_size, nrow(vietnam))  # 處理最後一個小包
+  
+  # 提取當前小包的數據
+  small_df <- vietnam[start_row:end_row, ]
+  
+  # 將小包添加到列表中
+  small_dfs[[i]] <- small_df
+}
+
+# 新增24個新的dataframe，各自對應一個小包
+df1 <- small_dfs[[1]]
+df2 <- small_dfs[[2]]
+df3 <- small_dfs[[3]]
+df4 <- small_dfs[[4]]
+df5 <- small_dfs[[5]]
+df6 <- small_dfs[[6]]
+df7 <- small_dfs[[7]]
+df8 <- small_dfs[[8]]
+df9 <- small_dfs[[9]]
+df10 <- small_dfs[[10]]
+df11<- small_dfs[[11]]
+df12<- small_dfs[[12]]
+df13<- small_dfs[[13]]
+df14<- small_dfs[[14]]
+df15<- small_dfs[[15]]
+df16<- small_dfs[[16]]
+df17<- small_dfs[[17]]
+df18<- small_dfs[[18]]
+df19<- small_dfs[[19]]
+df20<- small_dfs[[20]]
+df21<- small_dfs[[21]]
+df22 <- small_dfs[[22]]
+df23<- small_dfs[[23]]
+df24 <- small_dfs[[24]]
+
+
+
+```
+
+#清各國資料
+```{r}
+#馬來西亞
+colnames(馬來西亞)[1] <- 'name'
+colnames(馬來西亞)[9] <- 'date'
+malaysia <- select(馬來西亞,name,date,URL,Message)
+
+malaysia<-filter(malaysia,grepl("China",malaysia$Message)) #篩出有含「中國」的貼文
+
+write.csv(malaysia, "malaysia.csv", row.names = FALSE)
+
+#蒙古
+colnames(蒙古國)[1] <- 'name'
+colnames(蒙古國)[11] <- 'date'
+mongolia <- select(蒙古國,name,date,URL,Message)
+
+mongolia<-filter(mongolia,grepl("Хятад",mongolia$Message)) #篩出有含「中國」的貼文
+
+write.csv(mongolia, "mongolia.csv", row.names = FALSE)
+
+#孟加拉
+colnames(孟加拉)[1] <- 'name'
+colnames(孟加拉)[11] <- 'date'
+Bengal <- select(孟加拉,name,date,URL,Message)
+
+Bengal<-filter(Bengal,grepl("চীন",Bengal$Message)) #篩出有含「中國」的貼文
+
+write.csv(Bengal, "Bengal.csv", row.names = FALSE)
+
+#土耳其
+colnames(土耳其)[1] <- 'name'
+colnames(土耳其)[11] <- 'date'
+Turkey <- select(土耳其,name,date,URL,Message)
+
+
+Turkey<-filter(Turkey,grepl("Çin",Turkey$Message)) #篩出有含「中國」的貼文
+
+write.csv(Turkey, "Turkey.csv", row.names = FALSE)
+
+#阿爾巴尼亞
+colnames(阿爾巴尼亞)[1] <- 'name'
+colnames(阿爾巴尼亞)[11] <- 'date'
+Albania <- select(阿爾巴尼亞,name,date,URL,Message)
+
+Albania<-filter(Albania,grepl("Kinë",Albania$Message)) #篩出有含「中國」的貼文
+
+write.csv(Albania, "Albania.csv", row.names = FALSE)
+
+#奧地利
+colnames(奧地利)[1] <- 'name'
+colnames(奧地利)[11] <- 'date'
+Austria <- select(奧地利,name,date,URL,Message)
+
+Austria<-filter(Austria,grepl("China",Austria$Message)) #篩出有含「中國」的貼文
+
+write.csv(Austria, "Austria.csv", row.names = FALSE)
+
+
+#保加利亞
+colnames(保加利亞)[1] <- 'name'
+colnames(保加利亞)[11] <- 'date'
+Bulgaria <- select(保加利亞,name,date,URL,Message)
+
+Bulgaria<-filter(Bulgaria,grepl("Китай",Bulgaria$Message)) #篩出有含「中國」的貼文
+
+write.csv(Bulgaria, "Bulgaria.csv", row.names = FALSE)
+
+#北馬其頓
+colnames(北馬其頓)[1] <- 'name'
+colnames(北馬其頓)[11] <- 'date'
+Macedonia <- select(北馬其頓,name,date,URL,Message)
+
+Macedonia<-filter(Macedonia,grepl("Кина",Macedonia$Message)) #篩出有含「中國」的貼文
+
+write.csv(Macedonia, "Macedonia.csv", row.names = FALSE)
+
+#波士尼亞與赫塞哥維納
+colnames(波士尼亞與赫塞哥維納)[1] <- 'name'
+colnames(波士尼亞與赫塞哥維納)[11] <- 'date'
+Bosnia <- select(波士尼亞與赫塞哥維納,name,date,URL,Message)
+
+Bosnia<-filter(Bosnia,grepl("Kina",Bosnia$Message)|grepl("kina",Bosnia$Message)) #篩出有含「中國」的貼文
+
+write.csv(Bosnia, "Bosnia.csv", row.names = FALSE)
+
+#喬治亞
+colnames(喬治亞)[1] <- 'name'
+colnames(喬治亞)[11] <- 'date'
+Georgia <- select(喬治亞,name,date,URL,Message)
+
+Georgia<-filter(Georgia,grepl("ჩინეთი",Georgia$Message)) #篩出有含「中國」的貼文
+
+write.csv(Georgia, "Georgia.csv", row.names = FALSE)
+
+#哈薩克
+colnames(哈薩克)[1] <- 'name'
+colnames(哈薩克)[11] <- 'date'
+Kazakhstan <- select(哈薩克,name,date,URL,Message)
+
+Kazakhstan<-filter(Kazakhstan,grepl("Қытай",Kazakhstan$Message)) #篩出有含「中國」的貼文
+
+write.csv(Kazakhstan, "Kazakhstan.csv", row.names = FALSE)
+
+#韓國
+colnames(韓國)[1] <- 'name'
+colnames(韓國)[11] <- 'date'
+Korea <- select(韓國,name,date,URL,Message)
+
+Korea<-filter(Korea,grepl("중국",Korea$Message)) #篩出有含「中國」的貼文
+
+write.csv(Korea, "Korea.csv", row.names = FALSE)
+
+#吉爾吉斯
+colnames(吉爾吉斯)[1] <- 'name'
+colnames(吉爾吉斯)[11] <- 'date'
+Kyrgyzstan <- select(吉爾吉斯,name,date,URL,Message)
+
+Kyrgyzstan<-filter(Kyrgyzstan,grepl("Кытай",Kyrgyzstan$Message)) #篩出有含「中國」的貼文
+
+write.csv(Kyrgyzstan, "Kyrgyzstan.csv", row.names = FALSE)
+
+#塔吉克
+colnames(塔吉克)[1] <- 'name'
+colnames(塔吉克)[11] <- 'date'
+Tajik <- select(塔吉克,name,date,URL,Message)
+
+Tajik<-filter(Tajik,grepl("Хитой",Tajik$Message)) #篩出有含「中國」的貼文
+
+write.csv(Tajik, "Tajik.csv", row.names = FALSE)
+
+#泰國
+colnames(泰國)[1] <- 'name'
+colnames(泰國)[11] <- 'date'
+Thailand<- select(泰國,name,date,URL,Message)
+
+Thailand<-filter(Thailand,grepl("จีน",Thailand$Message)|grepl("China",Thailand$Message)) #篩出有含「中國」的貼文
+
+write.csv(Thailand , "Thailand.csv", row.names = FALSE)
+
+#亞美尼亞
+colnames(亞美尼亞)[1] <- 'name'
+colnames(亞美尼亞)[11] <- 'date'
+Armenia<- select(亞美尼亞,name,date,URL,Message)
+
+Armenia<-filter(Armenia,grepl("Չինաստան",Armenia$Message)) #篩出有含「中國」的貼文
+
+write.csv(Armenia, "Armenia.csv", row.names = FALSE)
+
+#埃及
+colnames(埃及)[1] <- 'name'
+colnames(埃及)[11] <- 'date'
+Egypt<- select(埃及,name,date,URL,Message)
+
+Egypt<-filter(Egypt,grepl("الصين",Egypt$Message)) #篩出有含「中國」的貼文
+
+write.csv(Egypt, "Egypt.csv", row.names = FALSE)
+
+#馬達加斯加
+colnames(馬達加斯加)[1] <- 'name'
+colnames(馬達加斯加)[11] <- 'date'
+madagascar<- select(馬達加斯加,name,date,URL,Message)
+
+madagascar<-filter(madagascar,grepl("CHINE",madagascar$Message)|grepl("Chine",madagascar$Message)) #篩出有含「中國」的貼文
+
+write.csv(madagascar, "madagascar.csv", row.names = FALSE)
+
+#坦尚尼亞
+colnames(坦尚尼亞)[1] <- 'name'
+colnames(坦尚尼亞)[11] <- 'date'
+Tanzania<- select(坦尚尼亞,name,date,URL,Message)
+
+Tanzania<-filter(Tanzania,grepl("China",Tanzania$Message)|grepl("CHINA",Tanzania$Message)) #篩出有含「中國」的貼文
+
+write.csv(Tanzania, "Tanzania.csv", row.names = FALSE)
+
+#立陶宛
+colnames(立陶宛)[1] <- 'name'
+colnames(立陶宛)[11] <- 'date'
+Lithuania<- select(立陶宛,name,date,URL,Message)
+
+Lithuania<-filter(Lithuania,grepl("Kinija",Lithuania$Message)) #篩出有含「中國」的貼文
+
+write.csv(Lithuania, "Lithuania.csv", row.names = FALSE)
+
+#烏克蘭
+colnames(烏克蘭)[1] <- 'name'
+colnames(烏克蘭)[11] <- 'date'
+Ukraine<- select(烏克蘭,name,date,URL,Message)
+
+Ukraine<-filter(Ukraine,grepl("Китай",Ukraine$Message)) #篩出有含「中國」的貼文
+
+write.csv(Ukraine, "Ukraine.csv", row.names = FALSE)
+
+#義大利
+colnames(義大利)[1] <- 'name'
+colnames(義大利)[11] <- 'date'
+Italy<- select(義大利,name,date,URL,Message)
+
+Italy<-filter(Italy,grepl("Cina",Italy$Message)) #篩出有含「中國」的貼文
+
+write.csv(Italy, "Italy.csv", row.names = FALSE)
+
+```
+
+#對資料做 tfidf
+```{r}
+library(tidytext)
+library(tidyverse)
+library(vctrs)
+library(jiebaR)
+library(dplyr)
+library(stringr)
+library(data.table)
+library(plyr)
+```
+清理一下欄位內容
+```{r}
+#把欄位「continente」中的 “name,date,url,message,message_zh,country,continente” 用”  ”取代掉
+all$continente<-gsub("name,date,url,message,message_zh,country,continente","",all$continente)
+```
+
+
+```{r}
+wordbank <- read.csv("wordbank.csv")
+cc=worker(stop_word = "cn_stopwords.txt")
+for(n in 1:nrow(wordbank)){
+  new_user_word(cc,wordbank$word[n])
+} 
+
+test<-"陳培哲蔡英文黃國昌與你"
+test_final<-cc[test]
+```
+
+
+```{r}
+new_user_word(cc,"腰带和道路")
+new_user_word(cc,"皮带和道路")
+new_user_word(cc,"丝绸之路")
+new_user_word(cc,"基础设施")
+new_user_word(cc,"新西兰")
+new_user_word(cc,"习近平")
+new_user_word(cc,"Belt＆Road倡议")
+new_user_word(cc,"一帶一路")
+new_user_word(cc,"BRI")
+new_user_word(cc,"条纹和丝绸路线")
+new_user_word(cc,"脱衣舞和丝绸路线")
+new_user_word(cc,"投资协议")
+new_user_word(cc,"脱衣舞计划")
+new_user_word(cc,"沙特阿拉伯")
+new_user_word(cc,"伊斯兰")
+new_user_word(cc,"一条路和一条路")
+new_user_word(cc,"电晕病毒")
+new_user_word(cc,"数字贸易")
+new_user_word(cc,"借贷")
+new_user_word(cc,"道路和道路倡议")
+new_user_word(cc,"开发银行")
+new_user_word(cc,"腰带和路")
+new_user_word(cc,"國家安全會議")
+new_user_word(cc,"財政部")
+new_user_word(cc,"擱置爭議")
+new_user_word(cc,"到大陸的門戶")
+new_user_word(cc,"兩岸經濟協議")
+new_user_word(cc,"外銷")
+new_user_word(cc,"對外貿易")
+new_user_word(cc,"科學工業園區")
+```
+
+```{r}
+##新增一個欄位ID
+all$ID <- 1:10664
+
+all_word<-data.frame()
+
+for (n in 1:10664){
+print(n)
+temp <-filter(all,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(all_word,temp)
+all_word<-rbindlist(l)
+}
+
+## TFIDF
+all_word$qq<-ifelse(all_word$temp=="　","delete","")
+all_word<- filter(all_word,qq!="delete")
+all_word$qq=NULL
+
+all_TFIDF<-bind_tf_idf(all_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+all_TFIDF_top10<-data.frame()
+for (n in 1:10664){
+print(n)
+temp<-all_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+all_TFIDF_top10<-rbindlist(list(all_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+all_name <- select(all,date,ID,country,continente)
+
+all_TFIDF_top10<-left_join(all_name,all_TFIDF_top10,by="ID")  
+
+all_TFIDF_top10$date<-substr(all_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+all_year <- ddply(all_TFIDF_top10, c("date", "temp"), summarize, count = length(temp))
+```
+
+
+```{r}
+#依照洲別做關鍵字
+##亞洲
+Asia<-filter(all,grepl("亞洲",all$continente))
+Asia$ID=NULL
+
+Asia$ID <- 1:6050
+
+Asia_word<-data.frame()
+
+for (n in 1:6050){
+print(n)
+temp <-filter(Asia,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Asia_word,temp)
+Asia_word<-rbindlist(l)
+}
+
+## TFIDF
+Asia_word$qq<-ifelse(Asia_word$temp=="　","delete","")
+Asia_word<- filter(Asia_word,qq!="delete")
+Asia_word$qq=NULL
+
+Asia_TFIDF<-bind_tf_idf(Asia_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Asia_TFIDF_top10<-data.frame()
+for (n in 1:6050){
+print(n)
+temp<-Asia_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Asia_TFIDF_top10<-rbindlist(list(Asia_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Asia_name <- select(Asia,date,ID,country)
+
+Asia_TFIDF_top10<-left_join(Asia_name,Asia_TFIDF_top10,by="ID")  
+
+Asia_TFIDF_top10$year<-substr(Asia_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Asia_year <- ddply(Asia_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##歐洲
+Europe<-filter(all,grepl("歐洲",all$continente))
+Europe$ID=NULL
+
+Europe$ID <- 1:1711
+Europe_word<-data.frame()
+
+for (n in 1:1711){
+print(n)
+temp <-filter(Europe,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Europe_word,temp)
+Europe_word<-rbindlist(l)
+}
+
+## TFIDF
+Europe_word$qq<-ifelse(Europe_word$temp=="　","delete","")
+Europe_word<- filter(Europe_word,qq!="delete")
+Europe_word$qq=NULL
+
+Europe_TFIDF<-bind_tf_idf(Europe_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Europe_TFIDF_top10<-data.frame()
+for (n in 1:1711){
+print(n)
+temp<-Europe_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Europe_TFIDF_top10<-rbindlist(list(Europe_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Europe_name <- select(Europe,date,ID,country)
+
+Europe_TFIDF_top10<-left_join(Europe_name,Europe_TFIDF_top10,by="ID") 
+
+Europe_TFIDF_top10$year<-substr(Europe_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Europe_year <- ddply(Europe_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##非洲
+Africa<-filter(all,grepl("非洲",all$continente))
+Africa$ID=NULL
+
+Africa$ID <- 1:2193
+Africa_word<-data.frame()
+
+for (n in 1:2193){
+print(n)
+temp <-filter(Africa,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Africa_word,temp)
+Africa_word<-rbindlist(l)
+}
+
+## TFIDF
+Africa_word$qq<-ifelse(Africa_word$temp=="　","delete","")
+Africa_word<- filter(Africa_word,qq!="delete")
+Africa_word$qq=NULL
+
+Africa_TFIDF<-bind_tf_idf(Africa_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Africa_TFIDF_top10<-data.frame()
+for (n in 1:2193){
+print(n)
+temp<-Africa_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Africa_TFIDF_top10<-rbindlist(list(Africa_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Africa_name <- select(Africa,date,ID,country)
+
+Africa_TFIDF_top10<-left_join(Africa_name,Africa_TFIDF_top10,by="ID") 
+
+Africa_TFIDF_top10$year<-substr(Africa_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Africa_year <- ddply(Africa_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##拉丁美洲
+Latin<-filter(all,grepl("拉丁美洲",all$continente))
+Latin$ID=NULL
+
+Latin$ID <- 1:609
+Latin_word<-data.frame()
+
+for (n in 1:609){
+print(n)
+temp <-filter(Latin,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Latin_word,temp)
+Latin_word<-rbindlist(l)
+}
+
+## TFIDF
+Latin_word$qq<-ifelse(Latin_word$temp=="　","delete","")
+Latin_word<- filter(Latin_word,qq!="delete")
+Latin_word$qq=NULL
+
+Latin_TFIDF<-bind_tf_idf(Latin_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Latin_TFIDF_top10<-data.frame()
+for (n in 1:609){
+print(n)
+temp<-Latin_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Latin_TFIDF_top10<-rbindlist(list(Latin_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Latin_name <- select(Latin,date,ID,country)
+
+Latin_TFIDF_top10<-left_join(Latin_name,Latin_TFIDF_top10,by="ID") 
+
+Latin_TFIDF_top10$year<-substr(Latin_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Latin_year <- ddply(Latin_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##大洋洲
+ocean<-filter(all,grepl("大洋洲",all$continente))
+ocean$ID=NULL
+
+ocean$ID <- 1:101
+ocean_word<-data.frame()
+
+for (n in 1:101){
+print(n)
+temp <-filter(ocean,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(ocean_word,temp)
+ocean_word<-rbindlist(l)
+}
+
+## TFIDF
+ocean_word$qq<-ifelse(ocean_word$temp=="　","delete","")
+ocean_word<- filter(ocean_word,qq!="delete")
+ocean_word$qq=NULL
+
+ocean_TFIDF<-bind_tf_idf(ocean_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+ocean_TFIDF_top10<-data.frame()
+for (n in 1:101){
+print(n)
+temp<-ocean_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+ocean_TFIDF_top10<-rbindlist(list(ocean_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+ocean_name <- select(ocean,date,ID,country)
+
+ocean_TFIDF_top10<-left_join(ocean_name,ocean_TFIDF_top10,by="ID") 
+
+ocean_TFIDF_top10$year<-substr(ocean_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+ocean_year <- ddply(ocean_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+```
+
+
+#根據各州別的關鍵字特性做貼文的第二次篩選，篩完後做 tdidf
+```{r}
+#先把個洲別的年度關鍵字總和 print 出來，找出個別的「篩子」
+write.csv(Asia_year, "Asia_year.csv", row.names = FALSE)
+write.csv(Europe_year, "Europe_year.csv", row.names = FALSE)
+write.csv(Africa_year, "Africa_year.csv", row.names = FALSE)
+write.csv(Latin_year, "Latin_year.csv", row.names = FALSE)
+write.csv(ocean_year, "ocean_year.csv", row.names = FALSE)
+
+#各洲別篩選關鍵字
+Asia_2 <-filter(Asia,grepl("伊拉克",Asia$message_zh)|grepl("叙利亚",Asia$message_zh)|grepl("塔利班",Asia$message_zh)|grepl("尼泊尔",Asia$message_zh)|grepl("铁路",Asia$message_zh)|grepl("陷阱",Asia$message_zh)|grepl("中国",Asia$message_zh)|grepl("捍卫",Asia$message_zh)|grepl("印度尼西亚",Asia$message_zh)|grepl("柬埔寨",Asia$message_zh)|grepl("泰国",Asia$message_zh)|grepl("阿拉伯",Asia$message_zh)|grepl("苏丹",Asia$message_zh)|grepl("G7",Asia$message_zh)|grepl("债务",Asia$message_zh)|grepl("意大利",Asia$message_zh)|grepl("斯里兰卡",Asia$message_zh)|grepl("老挝",Asia$message_zh)|grepl("阿富汗",Asia$message_zh)|grepl("菲律宾",Asia$message_zh)|grepl("澳大利亚",Asia$message_zh)|grepl("美国",Asia$message_zh)|grepl("巴基斯坦",Asia$message_zh)|grepl("印度",Asia$message_zh)|grepl("火车",Asia$message_zh)|grepl("投资",Asia$message_zh)|grepl("马来西亚",Asia$message_zh)|grepl("缅甸",Asia$message_zh)|grepl("重建",Asia$message_zh)|grepl("俄罗斯",Asia$message_zh)|grepl("东盟",Asia$message_zh))
+
+Europe_2 <-filter(Europe,grepl("意大利",Europe$message_zh)|grepl("基础设施",Europe$message_zh)|grepl("俄罗斯",Europe$message_zh)|grepl("匈牙利",Europe$message_zh)|grepl("投资",Europe$message_zh)|grepl("丝绸之路",Europe$message_zh)|grepl("加入",Europe$message_zh)|grepl("中亚",Europe$message_zh)|grepl("海洋",Europe$message_zh)|grepl("塞尔维亚",Europe$message_zh)|grepl("商业",Europe$message_zh)|grepl("保加利亚",Europe$message_zh)|grepl("美国",Europe$message_zh)|grepl("梅洛",Europe$message_zh)|grepl("区域",Europe$message_zh)|grepl("澳大利亚",Europe$message_zh)|grepl("非洲",Europe$message_zh)|grepl("欧盟",Europe$message_zh)|grepl("合作",Europe$message_zh)|grepl("G7",Europe$message_zh)|grepl("哈萨克斯坦",Europe$message_zh)|grepl("出口",Europe$message_zh)|grepl("阿富汗",Europe$message_zh)|grepl("贷款",Europe$message_zh)|grepl("火车",Europe$message_zh)|grepl("普京",Europe$message_zh)|grepl("罪恶",Europe$message_zh)|grepl("桥梁",Europe$message_zh)|grepl("巴基斯坦",Europe$message_zh)|grepl("损害",Europe$message_zh))
+
+Africa_2 <-filter(Africa,grepl("埃及",Africa$message_zh)|grepl("摩洛哥",Africa$message_zh)|grepl("阿拉伯",Africa$message_zh)|grepl("阿尔及利亚",Africa$message_zh)|grepl("柴油",Africa$message_zh)|grepl("大学",Africa$message_zh)|grepl("行政",Africa$message_zh)|grepl("巴勒斯坦",Africa$message_zh)|grepl("中亚",Africa$message_zh)|grepl("毛里塔尼亚",Africa$message_zh)|grepl("经济",Africa$message_zh)|grepl("苏伊士运河",Africa$message_zh)|grepl("尼日利亚",Africa$message_zh)|grepl("合作",Africa$message_zh)|grepl("苏丹",Africa$message_zh)|grepl("俄罗斯",Africa$message_zh)|grepl("债务",Africa$message_zh)|grepl("赞比亚",Africa$message_zh)|grepl("美国",Africa$message_zh)|grepl("G7",Africa$message_zh)|grepl("投资",Africa$message_zh)|grepl("埃塞俄比亚",Africa$message_zh)|grepl("突尼斯",Africa$message_zh)|grepl("主权",Africa$message_zh)|grepl("欧洲",Africa$message_zh)|grepl("安全",Africa$message_zh)|grepl("火车",Africa$message_zh)|grepl("参加",Africa$message_zh)|grepl("澳大利亚",Africa$message_zh)|grepl("阿富汗",Africa$message_zh))
+
+Latin_2 <-filter(Latin,grepl("融资",Latin$message_zh)|grepl("阿根廷",Latin$message_zh)|grepl("加入",Latin$message_zh)|grepl("秘鲁",Latin$message_zh)|grepl("丝绸",Latin$message_zh)|grepl("俄罗斯",Latin$message_zh)|grepl("美国",Latin$message_zh)|grepl("意大利",Latin$message_zh)|grepl("慈善事业",Latin$message_zh)|grepl("贷款",Latin$message_zh)|grepl("欧洲",Latin$message_zh)|grepl("印度",Latin$message_zh)|grepl("尼加拉瓜",Latin$message_zh)|grepl("洪都拉斯",Latin$message_zh)|grepl("智利",Latin$message_zh)|grepl("巴拿马",Latin$message_zh)|grepl("玻利维亚",Latin$message_zh)|grepl("厄瓜多尔",Latin$message_zh)|grepl("哥斯达黎加",Latin$message_zh)|grepl("审查",Latin$message_zh)|grepl("Ecomony",Latin$message_zh)|grepl("古巴",Latin$message_zh)|grepl("路线",Latin$message_zh)|grepl("捐赠",Latin$message_zh)|grepl("刺激",Latin$message_zh)|grepl("批准",Latin$message_zh)|grepl("港口",Latin$message_zh)|grepl("斯里兰卡",Latin$message_zh)|grepl("梅洛",Latin$message_zh)|grepl("技术",Latin$message_zh))
+
+ocean_2 <-filter(ocean,grepl("奖学金",ocean$message_zh)|grepl("交流",ocean$message_zh)|grepl("创造",ocean$message_zh)|grepl("探索",ocean$message_zh)|grepl("交易",ocean$message_zh)|grepl("学生",ocean$message_zh)|grepl("新几内亚",ocean$message_zh)|grepl("澳大利亚",ocean$message_zh)|grepl("取消",ocean$message_zh)|grepl("png",ocean$message_zh)|grepl("艰难",ocean$message_zh)|grepl("矛盾",ocean$message_zh)|grepl("债务",ocean$message_zh)|grepl("投资",ocean$message_zh)|grepl("香港",ocean$message_zh)|grepl("经济",ocean$message_zh)|grepl("斐济",ocean$message_zh)|grepl("加入",ocean$message_zh)|grepl("赠款",ocean$message_zh)|grepl("汤加",ocean$message_zh)|grepl("库克群岛",ocean$message_zh)|grepl("所罗门群岛",ocean$message_zh)|grepl("合作",ocean$message_zh)|grepl("贸易",ocean$message_zh)|grepl("美国",ocean$message_zh)|grepl("风险",ocean$message_zh)|grepl("东南亚",ocean$message_zh)|grepl("區域合作",ocean$message_zh)|grepl("萨摩亚",ocean$message_zh)|grepl("农业",ocean$message_zh))
+```
+
+
+```{r}
+#依照洲別做關鍵字
+##亞洲
+Asia_2$ID=NULL
+
+Asia_2$ID <- 1:5374
+
+Asia2_word<-data.frame()
+
+for (n in 1:5374){
+print(n)
+temp <-filter(Asia_2,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Asia2_word,temp)
+Asia2_word<-rbindlist(l)
+}
+
+## TFIDF
+Asia2_word$qq<-ifelse(Asia2_word$temp=="　","delete","")
+Asia2_word<- filter(Asia2_word,qq!="delete")
+Asia2_word$qq=NULL
+
+Asia2_TFIDF<-bind_tf_idf(Asia2_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Asia2_TFIDF_top10<-data.frame()
+for (n in 1:5374){
+print(n)
+temp<-Asia2_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Asia2_TFIDF_top10<-rbindlist(list(Asia2_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Asia2_name <- select(Asia_2,date,ID,country)
+
+Asia2_TFIDF_top10<-left_join(Asia2_name,Asia2_TFIDF_top10,by="ID")  
+
+Asia2_TFIDF_top10$year<-substr(Asia2_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Asia2_year <- ddply(Asia2_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##歐洲
+Europe_2$ID=NULL
+
+Europe_2$ID <- 1:1351
+Europe2_word<-data.frame()
+
+for (n in 1:1351){
+print(n)
+temp <-filter(Europe_2,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Europe2_word,temp)
+Europe2_word<-rbindlist(l)
+}
+
+## TFIDF
+Europe2_word$qq<-ifelse(Europe2_word$temp=="　","delete","")
+Europe2_word<- filter(Europe2_word,qq!="delete")
+Europe2_word$qq=NULL
+
+Europe2_TFIDF<-bind_tf_idf(Europe2_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Europe2_TFIDF_top10<-data.frame()
+for (n in 1:1351){
+print(n)
+temp<-Europe2_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Europe2_TFIDF_top10<-rbindlist(list(Europe2_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Europe2_name <- select(Europe_2,date,ID,country)
+
+Europe2_TFIDF_top10<-left_join(Europe2_name,Europe2_TFIDF_top10,by="ID") 
+
+Europe2_TFIDF_top10$year<-substr(Europe2_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Europe2_year <- ddply(Europe2_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##非洲
+Africa_2$ID=NULL
+
+Africa_2$ID <- 1:1753
+Africa2_word<-data.frame()
+
+for (n in 1:1753){
+print(n)
+temp <-filter(Africa_2,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Africa2_word,temp)
+Africa2_word<-rbindlist(l)
+}
+
+## TFIDF
+Africa2_word$qq<-ifelse(Africa2_word$temp=="　","delete","")
+Africa2_word<- filter(Africa2_word,qq!="delete")
+Africa2_word$qq=NULL
+
+Africa2_TFIDF<-bind_tf_idf(Africa2_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Africa2_TFIDF_top10<-data.frame()
+for (n in 1:1753){
+print(n)
+temp<-Africa2_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Africa2_TFIDF_top10<-rbindlist(list(Africa2_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Africa2_name <- select(Africa_2,date,ID,country)
+
+Africa2_TFIDF_top10<-left_join(Africa2_name,Africa2_TFIDF_top10,by="ID") 
+
+Africa2_TFIDF_top10$year<-substr(Africa2_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Africa2_year <- ddply(Africa2_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##拉丁美洲
+Latin_2$ID=NULL
+
+Latin_2$ID <- 1:500
+Latin2_word<-data.frame()
+
+for (n in 1:500){
+print(n)
+temp <-filter(Latin_2,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Latin2_word,temp)
+Latin2_word<-rbindlist(l)
+}
+
+## TFIDF
+Latin2_word$qq<-ifelse(Latin2_word$temp=="　","delete","")
+Latin2_word<- filter(Latin2_word,qq!="delete")
+Latin2_word$qq=NULL
+
+Latin2_TFIDF<-bind_tf_idf(Latin2_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Latin2_TFIDF_top10<-data.frame()
+for (n in 1:500){
+print(n)
+temp<-Latin2_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Latin2_TFIDF_top10<-rbindlist(list(Latin2_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Latin2_name <- select(Latin_2,date,ID,country)
+
+Latin2_TFIDF_top10<-left_join(Latin2_name,Latin2_TFIDF_top10,by="ID") 
+
+Latin2_TFIDF_top10$year<-substr(Latin2_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+Latin2_year <- ddply(Latin2_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##大洋洲
+ocean_2$ID=NULL
+
+ocean_2$ID <- 1:76
+ocean2_word<-data.frame()
+
+for (n in 1:76){
+print(n)
+temp <-filter(ocean_2,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(ocean2_word,temp)
+ocean2_word<-rbindlist(l)
+}
+
+## TFIDF
+ocean2_word$qq<-ifelse(ocean2_word$temp=="　","delete","")
+ocean2_word<- filter(ocean2_word,qq!="delete")
+ocean2_word$qq=NULL
+
+ocean2_TFIDF<-bind_tf_idf(ocean2_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+ocean2_TFIDF_top10<-data.frame()
+for (n in 1:76){
+print(n)
+temp<-ocean2_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+ocean2_TFIDF_top10<-rbindlist(list(ocean2_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+ocean2_name <- select(ocean_2,date,ID,country)
+
+ocean2_TFIDF_top10<-left_join(ocean2_name,ocean2_TFIDF_top10,by="ID") 
+
+ocean2_TFIDF_top10$year<-substr(ocean2_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+ocean2_year <- ddply(ocean2_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+```
+#找出各洲別獨有的關鍵字
+```{r}
+#亞洲
+##先把五洲的關鍵字放在同一個 dataframe中，然後找出 Asia 獨有的詞彙
+unique_words_d1 <- unique(test$Asia)
+unique_words_d2_to_d5 <- unique(unlist(test[, c("Europe", "Africa", "Latin", "Ocean")]))
+missing_words_d1 <- setdiff(unique_words_d1, unique_words_d2_to_d5)
+print(missing_words_d1)
+
+missing_words_asia <- data.frame(missing_words = missing_words_d1)
+
+##再把亞洲的獨有詞彙丟回亞洲各年度關鍵字list中，去 mapping 其 count
+colnames(missing_words_asia)[1] <- 'temp'
+miss_Asia<-merge(Asia2_year,missing_words_asia,by="temp")  
+```
+#把關鍵字丟回原本的 dataframe 看貼文變化
+```{r}
+#斯里蘭卡
+Asia_2$year<-substr(Asia_2$date,1,4)
+Asia2_common1 <-filter(Asia_2,grepl("斯里兰卡",Asia_2$message_zh))
+Asia2_common1 <-filter(Asia2_common1,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe_2$year<-substr(Europe_2$date,1,4)
+Europe2_common1 <-filter(Europe_2,grepl("斯里兰卡",Europe_2$message_zh))
+Europe2_common1 <-filter(Europe2_common1,year=="2019"|year=="2022")
+
+Africa_2$year<-substr(Africa_2$date,1,4)
+Africa2_common1 <-filter(Africa_2,grepl("斯里兰卡",Africa_2$message_zh))
+Africa2_common1 <-filter(Africa2_common1,year=="2017"|year=="2018"|year=="2022"|year=="2023")
+
+Latin_2$year<-substr(Latin_2$date,1,4)
+Latin2_common1 <-filter(Latin_2,grepl("斯里兰卡",Latin_2$message_zh))
+Latin2_common1 <-filter(Latin2_common1,year=="2020"|year=="2022")
+
+ocean_2$year<-substr(ocean_2$date,1,4)
+ocean2_common1 <-filter(ocean_2,grepl("斯里兰卡",ocean_2$message_zh))
+ocean2_common1 <-filter(ocean2_common1,year=="2020")
+
+srilanka <- rbind(Asia2_common1,Europe2_common1,Africa2_common1,Latin2_common1,ocean2_common1)
+
+
+#美國
+Asia2_common2 <-filter(Asia_2,grepl("美国",Asia_2$message_zh))
+Asia2_common2 <-filter(Asia2_common2,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common2 <-filter(Europe_2,grepl("美国",Europe_2$message_zh))
+Europe2_common2 <-filter(Europe2_common2,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common2 <-filter(Africa_2,grepl("美国",Africa_2$message_zh))
+Africa2_common2 <-filter(Africa2_common2,year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common2 <-filter(Latin_2,grepl("美国",Latin_2$message_zh))
+Latin2_common2 <-filter(Latin2_common2,year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+ocean2_common2 <-filter(ocean_2,grepl("美国",ocean_2$message_zh))
+ocean2_common2 <-filter(ocean2_common2,year=="2020"|year=="2021")
+
+US <- rbind(Asia2_common2,Europe2_common2,Africa2_common2,Latin2_common2,ocean2_common2)
+
+#俄羅斯
+Asia2_common3 <-filter(Asia_2,grepl("俄罗斯",Asia_2$message_zh))
+Asia2_common3 <-filter(Asia2_common3,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2016"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common3 <-filter(Europe_2,grepl("俄罗斯",Europe_2$message_zh))
+Europe2_common3 <-filter(Europe2_common3,year=="2017"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common3 <-filter(Africa_2,grepl("俄罗斯",Africa_2$message_zh))
+Africa2_common3 <-filter(Africa2_common3,year=="2016"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common3 <-filter(Latin_2,grepl("俄罗斯",Latin_2$message_zh))
+Latin2_common3 <-filter(Latin2_common3,year=="2016"|year=="2021"|year=="2022"|year=="2017")
+
+ocean2_common3 <-filter(ocean_2,grepl("俄罗斯",ocean_2$message_zh))
+ocean2_common3 <-filter(ocean2_common3,year=="2022")
+
+Russia <- rbind(Asia2_common3,Europe2_common3,Africa2_common3,Latin2_common3,ocean2_common3)
+
+#伊朗
+Asia2_common4 <-filter(Asia_2,grepl("伊朗",Asia_2$message_zh))
+Asia2_common4 <-filter(Asia2_common4,year=="2015"|year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common4 <-filter(Europe_2,grepl("伊朗",Europe_2$message_zh))
+Europe2_common4 <-filter(Europe2_common4,year=="2017"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common4 <-filter(Africa_2,grepl("伊朗",Africa_2$message_zh))
+Africa2_common4 <-filter(Africa2_common4,year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common4 <-filter(Latin_2,grepl("伊朗",Latin_2$message_zh))
+Latin2_common4 <-filter(Latin2_common4,year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+ocean2_common4 <-filter(ocean_2,grepl("伊朗",ocean_2$message_zh))
+ocean2_common4 <-filter(ocean2_common4,year=="2021")
+
+Iran <- rbind(Asia2_common4,Europe2_common4,Africa2_common4,Latin2_common4,ocean2_common4)
+
+#中亚
+Asia2_common5 <-filter(Asia_2,grepl("中亚",Asia_2$message_zh))
+Asia2_common5 <-filter(Asia2_common5,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common5 <-filter(Europe_2,grepl("中亚",Europe_2$message_zh))
+Europe2_common5 <-filter(Europe2_common5,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2023")
+
+Africa2_common5 <-filter(Africa_2,grepl("中亚",Africa_2$message_zh))
+Africa2_common5 <-filter(Africa2_common5,year=="2019"|year=="2023")
+
+Latin2_common5 <-filter(Latin_2,grepl("中亚",Latin_2$message_zh))
+Latin2_common5 <-filter(Latin2_common5,year=="2022"|year=="2023")
+
+ocean2_common5 <-filter(ocean_2,grepl("中亚",ocean_2$message_zh))
+ocean2_common5 <-filter(ocean2_common5,year=="2021")
+
+Midasia <- rbind(Asia2_common5,Europe2_common5,Africa2_common5,Latin2_common5,ocean2_common5)
+
+#印度
+Asia2_common6 <-filter(Asia_2,grepl("印度",Asia_2$message_zh))
+Asia2_common6 <-filter(Asia2_common6,year=="2015"|year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common6 <-filter(Europe_2,grepl("印度",Europe_2$message_zh))
+Europe2_common6 <-filter(Europe2_common6,year=="2017"|year=="2020"|year=="2021"|year=="2023")
+
+Africa2_common6 <-filter(Africa_2,grepl("印度",Africa_2$message_zh))
+Africa2_common6 <-filter(Africa2_common6,year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common6 <-filter(Latin_2,grepl("印度",Latin_2$message_zh))
+Latin2_common6 <-filter(Latin2_common6,year=="2017"|year=="2020"|year=="2023")
+
+ocean2_common6 <-filter(ocean_2,grepl("印度",ocean_2$message_zh))
+ocean2_common6 <-filter(ocean2_common6,year=="2020")
+
+India <- rbind(Asia2_common6,Europe2_common6,Africa2_common6,Latin2_common6,ocean2_common6)
+
+#南美
+Asia2_common7 <-filter(Asia_2,grepl("南美",Asia_2$message_zh))
+Asia2_common7 <-filter(Asia2_common7,year=="2015"|year=="2018"|year=="2019")
+
+Europe2_common7 <-filter(Europe_2,grepl("南美",Europe_2$message_zh))
+Europe2_common7 <-filter(Europe2_common7,year=="2019"|year=="2022")
+
+Africa2_common7 <-filter(Africa_2,grepl("南美",Africa_2$message_zh))
+Africa2_common7 <-filter(Africa2_common7,year=="2022")
+
+Latin2_common7 <-filter(Latin_2,grepl("南美",Latin_2$message_zh))
+Latin2_common7 <-filter(Latin2_common7,year=="2022"|year=="2023")
+
+ocean2_common7 <-filter(ocean_2,grepl("南美",ocean_2$message_zh))
+ocean2_common7 <-filter(ocean2_common7,year=="2019")
+
+Soulatin <- rbind(Asia2_common7,Europe2_common7,Africa2_common7,Latin2_common7,ocean2_common7)
+
+#乌克兰
+Asia2_common8 <-filter(Asia_2,grepl("乌克兰",Asia_2$message_zh))
+Asia2_common8 <-filter(Asia2_common8,year=="2016"|year=="2017"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common8 <-filter(Europe_2,grepl("乌克兰",Europe_2$message_zh))
+Europe2_common8 <-filter(Europe2_common8,year=="2015"|year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common8 <-filter(Africa_2,grepl("乌克兰",Africa_2$message_zh))
+Africa2_common8 <-filter(Africa2_common8,year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common8 <-filter(Latin_2,grepl("乌克兰",Latin_2$message_zh))
+Latin2_common8 <-filter(Latin2_common8,year=="2022"|year=="2023")
+
+ocean2_common8 <-filter(ocean_2,grepl("乌克兰",ocean_2$message_zh))
+ocean2_common8 <-filter(ocean2_common8,year=="2022")
+
+Ukraine <- rbind(Asia2_common8,Europe2_common8,Africa2_common8,Latin2_common8,ocean2_common8)
+
+#铁路
+Asia2_common9 <-filter(Asia_2,grepl("铁路",Asia_2$message_zh))
+Asia2_common9 <-filter(Asia2_common9,year=="2015"|year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common9 <-filter(Europe_2,grepl("铁路",Europe_2$message_zh))
+Europe2_common9 <-filter(Europe2_common9,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common9 <-filter(Africa_2,grepl("铁路",Africa_2$message_zh))
+Africa2_common9 <-filter(Africa2_common9,year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common9 <-filter(Latin_2,grepl("铁路",Latin_2$message_zh))
+Latin2_common9 <-filter(Latin2_common9,year=="2018"|year=="2022")
+
+ocean2_common9 <-filter(ocean_2,grepl("铁路",ocean_2$message_zh))
+ocean2_common9 <-filter(ocean2_common9,year=="2017")
+
+railway <- rbind(Asia2_common9,Europe2_common9,Africa2_common9,Latin2_common9,ocean2_common9)
+
+#农业
+Asia2_common10 <-filter(Asia_2,grepl("农业",Asia_2$message_zh))
+Asia2_common10 <-filter(Asia2_common10,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common10 <-filter(Europe_2,grepl("农业",Europe_2$message_zh))
+Europe2_common10 <-filter(Europe2_common10,year=="2016"|year=="2019")
+
+Africa2_common10 <-filter(Africa_2,grepl("农业",Africa_2$message_zh))
+Africa2_common10 <-filter(Africa2_common10,year=="2018"|year=="2019"|year=="2022"|year=="2023")
+
+Latin2_common10 <-filter(Latin_2,grepl("农业",Latin_2$message_zh))
+Latin2_common10 <-filter(Latin2_common10,year=="2017"|year=="2022")
+
+ocean2_common10 <-filter(ocean_2,grepl("农业",ocean_2$message_zh))
+ocean2_common10 <-filter(ocean2_common10,year=="2023")
+
+rice <- rbind(Asia2_common10,Europe2_common10,Africa2_common10,Latin2_common10,ocean2_common10)
+
+#石油
+Asia2_common11 <-filter(Asia_2,grepl("石油",Asia_2$message_zh))
+Asia2_common11 <-filter(Asia2_common11,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common11 <-filter(Europe_2,grepl("石油",Europe_2$message_zh))
+Europe2_common11 <-filter(Europe2_common11,year=="2015"|year=="2017"|year=="2019"|year=="2020"|year=="2021")
+
+Africa2_common11 <-filter(Africa_2,grepl("石油",Africa_2$message_zh))
+Africa2_common11 <-filter(Africa2_common11,year=="2019"|year=="2023")
+
+Latin2_common11 <-filter(Latin_2,grepl("石油",Latin_2$message_zh))
+Latin2_common11 <-filter(Latin2_common11,year=="2020"|year=="2021"|year=="2022")
+
+ocean2_common11 <-filter(ocean_2,grepl("石油",ocean_2$message_zh))
+ocean2_common11 <-filter(ocean2_common11,year=="2021")
+
+oil <- rbind(Asia2_common11,Europe2_common11,Africa2_common11,Latin2_common11,ocean2_common11)
+
+#电力
+Asia2_common12 <-filter(Asia_2,grepl("电力",Asia_2$message_zh))
+Asia2_common12 <-filter(Asia2_common12,year=="2017"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common12 <-filter(Europe_2,grepl("电力",Europe_2$message_zh))
+Europe2_common12 <-filter(Europe2_common12,year=="2018"|year=="2021")
+
+Africa2_common12 <-filter(Africa_2,grepl("电力",Africa_2$message_zh))
+Africa2_common12 <-filter(Africa2_common12,year=="2018"|year=="2019"|year=="2023")
+
+Latin2_common12 <-filter(Latin_2,grepl("电力",Latin_2$message_zh))
+Latin2_common12 <-filter(Latin2_common12,year=="2022")
+
+ocean2_common12 <-filter(ocean_2,grepl("电力",ocean_2$message_zh))
+ocean2_common12 <-filter(ocean2_common12,year=="2018")
+
+electricity <- rbind(Asia2_common12,Europe2_common12,Africa2_common12,Latin2_common12,ocean2_common12)
+
+#债务
+Asia2_common13 <-filter(Asia_2,grepl("债务",Asia_2$message_zh))
+Asia2_common13 <-filter(Asia2_common13,year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common13 <-filter(Europe_2,grepl("债务",Europe_2$message_zh))
+Europe2_common13 <-filter(Europe2_common13,year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common13 <-filter(Africa_2,grepl("债务",Africa_2$message_zh))
+Africa2_common13 <-filter(Africa2_common13,year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common13 <-filter(Latin_2,grepl("债务",Latin_2$message_zh))
+Latin2_common13 <-filter(Latin2_common13,year=="2019"|year=="2020"|year=="2022"|year=="2023")
+
+ocean2_common13 <-filter(ocean_2,grepl("债务",ocean_2$message_zh))
+ocean2_common13 <-filter(ocean2_common13,year=="2019")
+
+debt <- rbind(Asia2_common13,Europe2_common13,Africa2_common13,Latin2_common13,ocean2_common13)
+
+#投资
+Asia2_common14 <-filter(Asia_2,grepl("投资",Asia_2$message_zh))
+Asia2_common14 <-filter(Asia2_common14,year=="2015"|year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common14 <-filter(Europe_2,grepl("投资",Europe_2$message_zh))
+Europe2_common14 <-filter(Europe2_common14,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common14 <-filter(Africa_2,grepl("投资",Africa_2$message_zh))
+Africa2_common14 <-filter(Africa2_common14,year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common14 <-filter(Latin_2,grepl("投资",Latin_2$message_zh))
+Latin2_common14 <-filter(Latin2_common14,year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+ocean2_common14 <-filter(ocean_2,grepl("投资",ocean_2$message_zh))
+ocean2_common14 <-filter(ocean2_common14,year=="2018"|year=="2019")
+
+invest <- rbind(Asia2_common14,Europe2_common14,Africa2_common14,Latin2_common14,ocean2_common14)
+
+#经济
+Asia2_common15 <-filter(Asia_2,grepl("经济",Asia_2$message_zh))
+Asia2_common15 <-filter(Asia2_common15,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common15 <-filter(Europe_2,grepl("经济",Europe_2$message_zh))
+Europe2_common15 <-filter(Europe2_common15,year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common15 <-filter(Africa_2,grepl("经济",Africa_2$message_zh))
+Africa2_common15 <-filter(Africa2_common15,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common15 <-filter(Latin_2,grepl("经济",Latin_2$message_zh))
+Latin2_common15 <-filter(Latin2_common15,year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+ocean2_common15 <-filter(ocean_2,grepl("经济",ocean_2$message_zh))
+ocean2_common15 <-filter(ocean2_common15,year=="2018"|year=="2020")
+
+economic <- rbind(Asia2_common15,Europe2_common15,Africa2_common15,Latin2_common15,ocean2_common15)
+
+#贸易
+Asia2_common16 <-filter(Asia_2,grepl("贸易",Asia_2$message_zh))
+Asia2_common16 <-filter(Asia2_common16,year=="2015"|year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common16 <-filter(Europe_2,grepl("贸易",Europe_2$message_zh))
+Europe2_common16 <-filter(Europe2_common16,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common16 <-filter(Africa_2,grepl("贸易",Africa_2$message_zh))
+Africa2_common16 <-filter(Africa2_common16,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common16 <-filter(Latin_2,grepl("贸易",Latin_2$message_zh))
+Latin2_common16 <-filter(Latin2_common16,year=="2017"|year=="2021"|year=="2022"|year=="2023")
+
+ocean2_common16 <-filter(ocean_2,grepl("贸易",ocean_2$message_zh))
+ocean2_common16 <-filter(ocean2_common16,year=="2017"|year=="2018"|year=="2020")
+
+trading <- rbind(Asia2_common16,Europe2_common16,Africa2_common16,Latin2_common16,ocean2_common16)
+
+#风险
+Asia2_common17 <-filter(Asia_2,grepl("风险",Asia_2$message_zh))
+Asia2_common17 <-filter(Asia2_common17,year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common17 <-filter(Europe_2,grepl("风险",Europe_2$message_zh))
+Europe2_common17 <-filter(Europe2_common17,year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2023")
+
+Africa2_common17 <-filter(Africa_2,grepl("风险",Africa_2$message_zh))
+Africa2_common17 <-filter(Africa2_common17,year=="2018"|year=="2019"|year=="2023")
+
+Latin2_common17 <-filter(Latin_2,grepl("风险",Latin_2$message_zh))
+Latin2_common17 <-filter(Latin2_common17,year=="2021"|year=="2023")
+
+ocean2_common17 <-filter(ocean_2,grepl("风险",ocean_2$message_zh))
+ocean2_common17 <-filter(ocean2_common17,year=="2018"|year=="2023")
+
+risk <- rbind(Asia2_common17,Europe2_common17,Africa2_common17,Latin2_common17,ocean2_common17)
+
+#交易
+Asia2_common18 <-filter(Asia_2,grepl("交易",Asia_2$message_zh))
+Asia2_common18 <-filter(Asia2_common18,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2023")
+
+Europe2_common18 <-filter(Europe_2,grepl("交易",Europe_2$message_zh))
+Europe2_common18 <-filter(Europe2_common18,year=="2018"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common18 <-filter(Africa_2,grepl("交易",Africa_2$message_zh))
+Africa2_common18 <-filter(Africa2_common18,year=="2018"|year=="2019"|year=="2021"|year=="2023")
+
+Latin2_common18 <-filter(Latin_2,grepl("交易",Latin_2$message_zh))
+Latin2_common18 <-filter(Latin2_common18,year=="2018")
+
+ocean2_common18 <-filter(ocean_2,grepl("交易",ocean_2$message_zh))
+ocean2_common18 <-filter(ocean2_common18,year=="2017")
+
+business <- rbind(Asia2_common18,Europe2_common18,Africa2_common18,Latin2_common18,ocean2_common18)
+
+#贷款
+Asia2_common19 <-filter(Asia_2,grepl("贷款",Asia_2$message_zh))
+Asia2_common19 <-filter(Asia2_common19,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common19 <-filter(Europe_2,grepl("贷款",Europe_2$message_zh))
+Europe2_common19 <-filter(Europe2_common19,year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common19 <-filter(Africa_2,grepl("贷款",Africa_2$message_zh))
+Africa2_common19 <-filter(Africa2_common19,year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common19 <-filter(Latin_2,grepl("贷款",Latin_2$message_zh))
+Latin2_common19 <-filter(Latin2_common19,year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+ocean2_common19 <-filter(ocean_2,grepl("贷款",ocean_2$message_zh))
+ocean2_common19 <-filter(ocean2_common19,year=="2018"|year=="2019")
+
+loan <- rbind(Asia2_common19,Europe2_common19,Africa2_common19,Latin2_common19,ocean2_common19)
+
+#出口
+Asia2_common20 <-filter(Asia_2,grepl("出口",Asia_2$message_zh))
+Asia2_common20 <-filter(Asia2_common20,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common20 <-filter(Europe_2,grepl("出口",Europe_2$message_zh))
+Europe2_common20 <-filter(Europe2_common20,year=="2019"|year=="2020"|year=="2021"|year=="2023")
+
+Africa2_common20 <-filter(Africa_2,grepl("出口",Africa_2$message_zh))
+Africa2_common20 <-filter(Africa2_common20,year=="2017"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common20 <-filter(Latin_2,grepl("出口",Latin_2$message_zh))
+Latin2_common20 <-filter(Latin2_common20,year=="2018"|year=="2019"|year=="2022"|year=="2023")
+
+ocean2_common20 <-filter(ocean_2,grepl("出口",ocean_2$message_zh))
+ocean2_common20 <-filter(ocean2_common20,year=="2022")
+
+output <- rbind(Asia2_common20,Europe2_common20,Africa2_common20,Latin2_common20,ocean2_common20)
+
+#加入
+Asia2_common21 <-filter(Asia_2,grepl("加入",Asia_2$message_zh))
+Asia2_common21 <-filter(Asia2_common21,year=="2015"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common21 <-filter(Europe_2,grepl("加入",Europe_2$message_zh))
+Europe2_common21 <-filter(Europe2_common21,year=="2015"|year=="2018"|year=="2019"|year=="2021"|year=="2023")
+
+Africa2_common21 <-filter(Africa_2,grepl("加入",Africa_2$message_zh))
+Africa2_common21 <-filter(Africa2_common21,year=="2017"|year=="2019"|year=="2022"|year=="2023")
+
+Latin2_common21 <-filter(Latin_2,grepl("加入",Latin_2$message_zh))
+Latin2_common21 <-filter(Latin2_common21,year=="2020"|year=="2019"|year=="2022"|year=="2023")
+
+ocean2_common21 <-filter(ocean_2,grepl("加入",ocean_2$message_zh))
+ocean2_common21 <-filter(ocean2_common21,year=="2018"|year=="2019")
+
+join <- rbind(Asia2_common21,Europe2_common21,Africa2_common21,Latin2_common21,ocean2_common21)
+
+#交流
+Asia2_common22 <-filter(Asia_2,grepl("交流",Asia_2$message_zh))
+Asia2_common22 <-filter(Asia2_common22,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common22 <-filter(Europe_2,grepl("交流",Europe_2$message_zh))
+Europe2_common22 <-filter(Europe2_common22,year=="2017"|year=="2018"|year=="2019"|year=="2023")
+
+Africa2_common22 <-filter(Africa_2,grepl("交流",Africa_2$message_zh))
+Africa2_common22 <-filter(Africa2_common22,year=="2020"|year=="2019"|year=="2022"|year=="2023")
+
+Latin2_common22 <-filter(Latin_2,grepl("交流",Latin_2$message_zh))
+Latin2_common22 <-filter(Latin2_common22,year=="2018"|year=="2022"|year=="2023")
+
+ocean2_common22 <-filter(ocean_2,grepl("交流",ocean_2$message_zh))
+ocean2_common22 <-filter(ocean2_common22,year=="2018"|year=="2017")
+
+comminicate <- rbind(Asia2_common22,Europe2_common22,Africa2_common22,Latin2_common22,ocean2_common22)
+
+#合作
+Asia2_common23 <-filter(Asia_2,grepl("合作",Asia_2$message_zh))
+Asia2_common23 <-filter(Asia2_common23,year=="2014"|year=="2015"|year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common23 <-filter(Europe_2,grepl("合作",Europe_2$message_zh))
+Europe2_common23 <-filter(Europe2_common23,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2022"|year=="2021"|year=="2023")
+
+Africa2_common23 <-filter(Africa_2,grepl("合作",Africa_2$message_zh))
+Africa2_common23 <-filter(Africa2_common23,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common23 <-filter(Latin_2,grepl("合作",Latin_2$message_zh))
+Latin2_common23 <-filter(Latin2_common23,year=="2017"|year=="2018"|year=="2019"|year=="2020"|year=="2021"|year=="2022"|year=="2023")
+
+ocean2_common23 <-filter(ocean_2,grepl("合作",ocean_2$message_zh))
+ocean2_common23 <-filter(ocean2_common23,year=="2018"|year=="2020"|year=="2023")
+
+cooperate <- rbind(Asia2_common23,Europe2_common23,Africa2_common23,Latin2_common23,ocean2_common23)
+
+#加强
+Asia2_common24 <-filter(Asia_2,grepl("加强",Asia_2$message_zh))
+Asia2_common24 <-filter(Asia2_common24,year=="2016"|year=="2017"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common24 <-filter(Europe_2,grepl("加强",Europe_2$message_zh))
+Europe2_common24 <-filter(Europe2_common24,year=="2017"|year=="2019"|year=="2020"|year=="2022"|year=="2021"|year=="2023")
+
+Africa2_common24 <-filter(Africa_2,grepl("加强",Africa_2$message_zh))
+Africa2_common24 <-filter(Africa2_common24,year=="2017"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common24 <-filter(Latin_2,grepl("加强",Latin_2$message_zh))
+Latin2_common24 <-filter(Latin2_common24,year=="2021"|year=="2022")
+
+ocean2_common24 <-filter(ocean_2,grepl("加强",ocean_2$message_zh))
+ocean2_common24 <-filter(ocean2_common24,year=="2018"|year=="2020")
+
+enhance <- rbind(Asia2_common24,Europe2_common24,Africa2_common24,Latin2_common24,ocean2_common24)
+
+#战略
+Asia2_common25 <-filter(Asia_2,grepl("战略",Asia_2$message_zh))
+Asia2_common25 <-filter(Asia2_common25,year=="2020"|year=="2017"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Europe2_common25 <-filter(Europe_2,grepl("战略",Europe_2$message_zh))
+Europe2_common25 <-filter(Europe2_common25,year=="2020"|year=="2017"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Africa2_common25 <-filter(Africa_2,grepl("战略",Africa_2$message_zh))
+Africa2_common25 <-filter(Africa2_common25,year=="2020"|year=="2016"|year=="2018"|year=="2019"|year=="2021"|year=="2022"|year=="2023")
+
+Latin2_common25 <-filter(Latin_2,grepl("战略",Latin_2$message_zh))
+Latin2_common25 <-filter(Latin2_common25,year=="2019"|year=="2021"|year=="2022")
+
+ocean2_common25 <-filter(ocean_2,grepl("战略",ocean_2$message_zh))
+ocean2_common25 <-filter(ocean2_common25,year=="2021")
+
+strategy <- rbind(Asia2_common25,Europe2_common25,Africa2_common25,Latin2_common25,ocean2_common25)
+
+#威胁
+Asia2_common26 <-filter(Asia_2,grepl("威胁",Asia_2$message_zh))
+Asia2_common26 <-filter(Asia2_common26,year=="2020"|year=="2018"|year=="2019"|year=="2021"|year=="2023")
+
+Europe2_common26 <-filter(Europe_2,grepl("威胁",Europe_2$message_zh))
+Europe2_common26 <-filter(Europe2_common26,year=="2017"|year=="2018"|year=="2019")
+
+Africa2_common26 <-filter(Africa_2,grepl("威胁",Africa_2$message_zh))
+Africa2_common26 <-filter(Africa2_common26,year=="2018")
+
+Latin2_common26 <-filter(Latin_2,grepl("威胁",Latin_2$message_zh))
+Latin2_common26 <-filter(Latin2_common26,year=="2020"|year=="2022")
+
+ocean2_common26 <-filter(ocean_2,grepl("威胁",ocean_2$message_zh))
+ocean2_common26 <-filter(ocean2_common26,year=="2020")
+
+threaten <- rbind(Asia2_common26,Europe2_common26,Africa2_common26,Latin2_common26,ocean2_common26)
+
+
+write.csv(srilanka, "srilanka.csv", row.names = FALSE)
+write.csv(US, "US.csv", row.names = FALSE)
+write.csv(Russia, "Russia.csv", row.names = FALSE)
+write.csv(Iran, "Iran.csv", row.names = FALSE)
+write.csv(Midasia, "Midasia.csv", row.names = FALSE)
+write.csv(India, "India.csv", row.names = FALSE)
+write.csv(Soulatin, "Soulatin.csv", row.names = FALSE)
+write.csv(Ukraine, "Ukraine.csv", row.names = FALSE)
+write.csv(railway, "railway.csv", row.names = FALSE)
+write.csv(rice, "rice.csv", row.names = FALSE)
+write.csv(oil, "oil.csv", row.names = FALSE)
+write.csv(electricity, "electricity.csv", row.names = FALSE)
+write.csv(debt, "debt.csv", row.names = FALSE)
+write.csv(invest, "invest.csv", row.names = FALSE)
+write.csv(economic, "economic.csv", row.names = FALSE)
+write.csv(trading, "trading.csv", row.names = FALSE)
+write.csv(risk, "risk.csv", row.names = FALSE)
+write.csv(business, "business.csv", row.names = FALSE)
+write.csv(loan, "loan.csv", row.names = FALSE)
+write.csv(output, "output.csv", row.names = FALSE)
+write.csv(join, "join.csv", row.names = FALSE)
+write.csv(comminicate, "comminicate.csv", row.names = FALSE)
+write.csv(cooperate, "cooperate.csv", row.names = FALSE)
+write.csv(enhance, "enhance.csv", row.names = FALSE)
+write.csv(strategy, "strategy.csv", row.names = FALSE)
+write.csv(threaten, "threaten.csv", row.names = FALSE)
+
+```
+  
+#關鍵字資料包再做一次 tfidf
+```{r}
+##斯里蘭卡
+srilanka$ID=NULL
+
+srilanka$ID <- 1:199
+srilanka_word<-data.frame()
+
+for (n in 1:199){
+print(n)
+temp <-filter(srilanka,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(srilanka_word,temp)
+srilanka_word<-rbindlist(l)
+}
+
+## TFIDF
+srilanka_word$qq<-ifelse(srilanka_word$temp=="　","delete","")
+srilanka_word<- filter(srilanka_word,qq!="delete")
+srilanka_word$qq=NULL
+
+srilanka_TFIDF<-bind_tf_idf(srilanka_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+srilanka_TFIDF_top10<-data.frame()
+for (n in 1:199){
+print(n)
+temp<-srilanka_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+srilanka_TFIDF_top10<-rbindlist(list(srilanka_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+srilanka_name <- select(srilanka,year,ID,country)
+
+srilanka_TFIDF_top10<-left_join(srilanka_name,srilanka_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+srilanka_year <- ddply(srilanka_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##美國
+US$ID=NULL
+
+US$ID <- 1:1369
+US_word<-data.frame()
+
+for (n in 1:1369){
+print(n)
+temp <-filter(US,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(US_word,temp)
+US_word<-rbindlist(l)
+}
+
+## TFIDF
+US_word$qq<-ifelse(US_word$temp=="　","delete","")
+US_word<- filter(US_word,qq!="delete")
+US_word$qq=NULL
+
+US_TFIDF<-bind_tf_idf(US_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+US_TFIDF_top10<-data.frame()
+for (n in 1:1369){
+print(n)
+temp<-US_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+US_TFIDF_top10<-rbindlist(list(US_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+US_name <- select(US,year,ID,country)
+
+US_TFIDF_top10<-left_join(US_name,US_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+US_year <- ddply(US_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##烏克蘭
+Ukraine$ID=NULL
+
+Ukraine$ID <- 1:225
+Ukraine_word<-data.frame()
+
+for (n in 1:225){
+print(n)
+temp <-filter(Ukraine,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Ukraine_word,temp)
+Ukraine_word<-rbindlist(l)
+}
+
+## TFIDF
+Ukraine_word$qq<-ifelse(Ukraine_word$temp=="　","delete","")
+Ukraine_word<- filter(Ukraine_word,qq!="delete")
+Ukraine_word$qq=NULL
+
+Ukraine_TFIDF<-bind_tf_idf(Ukraine_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Ukraine_TFIDF_top10<-data.frame()
+for (n in 1:225){
+print(n)
+temp<-Ukraine_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Ukraine_TFIDF_top10<-rbindlist(list(Ukraine_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Ukraine_name <- select(Ukraine,year,ID,country)
+
+Ukraine_TFIDF_top10<-left_join(Ukraine_name,Ukraine_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+Ukraine_year <- ddply(Ukraine_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##烏克蘭
+Ukraine$ID=NULL
+
+Ukraine$ID <- 1:225
+Ukraine_word<-data.frame()
+
+for (n in 1:225){
+print(n)
+temp <-filter(Ukraine,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Ukraine_word,temp)
+Ukraine_word<-rbindlist(l)
+}
+
+## TFIDF
+Ukraine_word$qq<-ifelse(Ukraine_word$temp=="　","delete","")
+Ukraine_word<- filter(Ukraine_word,qq!="delete")
+Ukraine_word$qq=NULL
+
+Ukraine_TFIDF<-bind_tf_idf(Ukraine_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Ukraine_TFIDF_top10<-data.frame()
+for (n in 1:225){
+print(n)
+temp<-Ukraine_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Ukraine_TFIDF_top10<-rbindlist(list(Ukraine_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Ukraine_name <- select(Ukraine,year,ID,country)
+
+Ukraine_TFIDF_top10<-left_join(Ukraine_name,Ukraine_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+Ukraine_year <- ddply(Ukraine_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##貿易
+trading$ID=NULL
+
+trading$ID <- 1:2039
+trading_word<-data.frame()
+
+for (n in 1:2039){
+print(n)
+temp <-filter(trading,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(trading_word,temp)
+trading_word<-rbindlist(l)
+}
+
+## TFIDF
+trading_word$qq<-ifelse(trading_word$temp=="　","delete","")
+trading_word<- filter(trading_word,qq!="delete")
+trading_word$qq=NULL
+
+trading_TFIDF<-bind_tf_idf(trading_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+trading_TFIDF_top10<-data.frame()
+for (n in 1:2039){
+print(n)
+temp<-trading_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+trading_TFIDF_top10<-rbindlist(list(trading_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+trading_name <- select(trading,year,ID,country)
+
+trading_TFIDF_top10<-left_join(trading_name,trading_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+trading_year <- ddply(trading_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##威脅
+threaten$ID=NULL
+
+threaten$ID <- 1:176
+threaten_word<-data.frame()
+
+for (n in 1:176){
+print(n)
+temp <-filter(threaten,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(threaten_word,temp)
+threaten_word<-rbindlist(l)
+}
+
+## TFIDF
+threaten_word$qq<-ifelse(threaten_word$temp=="　","delete","")
+threaten_word<- filter(threaten_word,qq!="delete")
+threaten_word$qq=NULL
+
+threaten_TFIDF<-bind_tf_idf(threaten_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+threaten_TFIDF_top10<-data.frame()
+for (n in 1:176){
+print(n)
+temp<-threaten_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+threaten_TFIDF_top10<-rbindlist(list(threaten_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+threaten_name <- select(threaten,year,ID,country)
+
+threaten_TFIDF_top10<-left_join(threaten_name,threaten_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+threaten_year <- ddply(threaten_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##戰略
+strategy$ID=NULL
+
+strategy$ID <- 1:1742
+strategy_word<-data.frame()
+
+for (n in 1:1742){
+print(n)
+temp <-filter(strategy,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(strategy_word,temp)
+strategy_word<-rbindlist(l)
+}
+
+## TFIDF
+strategy_word$qq<-ifelse(strategy_word$temp=="　","delete","")
+strategy_word<- filter(strategy_word,qq!="delete")
+strategy_word$qq=NULL
+
+strategy_TFIDF<-bind_tf_idf(strategy_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+strategy_TFIDF_top10<-data.frame()
+for (n in 1:1742){
+print(n)
+temp<-strategy_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+strategy_TFIDF_top10<-rbindlist(list(strategy_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+strategy_name <- select(strategy,year,ID,country)
+
+strategy_TFIDF_top10<-left_join(strategy_name,strategy_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+strategy_year <- ddply(strategy_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##南美
+Soulatin$ID=NULL
+
+Soulatin$ID <- 1:29
+Soulatin_word<-data.frame()
+
+for (n in 1:29){
+print(n)
+temp <-filter(Soulatin,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Soulatin_word,temp)
+Soulatin_word<-rbindlist(l)
+}
+
+## TFIDF
+Soulatin_word$qq<-ifelse(Soulatin_word$temp=="　","delete","")
+Soulatin_word<- filter(Soulatin_word,qq!="delete")
+Soulatin_word$qq=NULL
+
+Soulatin_TFIDF<-bind_tf_idf(Soulatin_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Soulatin_TFIDF_top10<-data.frame()
+for (n in 1:29){
+print(n)
+temp<-Soulatin_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Soulatin_TFIDF_top10<-rbindlist(list(Soulatin_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Soulatin_name <- select(Soulatin,year,ID,country)
+
+Soulatin_TFIDF_top10<-left_join(Soulatin_name,Soulatin_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+Soulatin_year <- ddply(Soulatin_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##俄羅斯
+Russia$ID=NULL
+
+Russia$ID <- 1:823
+Russia_word<-data.frame()
+
+for (n in 1:823){
+print(n)
+temp <-filter(Russia,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Russia_word,temp)
+Russia_word<-rbindlist(l)
+}
+
+## TFIDF
+Russia_word$qq<-ifelse(Russia_word$temp=="　","delete","")
+Russia_word<- filter(Russia_word,qq!="delete")
+Russia_word$qq=NULL
+
+Russia_TFIDF<-bind_tf_idf(Russia_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Russia_TFIDF_top10<-data.frame()
+for (n in 1:823){
+print(n)
+temp<-Russia_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Russia_TFIDF_top10<-rbindlist(list(Russia_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Russia_name <- select(Russia,year,ID,country)
+
+Russia_TFIDF_top10<-left_join(Russia_name,Russia_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+Russia_year <- ddply(Russia_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##風險
+risk$ID=NULL
+
+risk$ID <- 1:264
+risk_word<-data.frame()
+
+for (n in 1:264){
+print(n)
+temp <-filter(risk,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(risk_word,temp)
+risk_word<-rbindlist(l)
+}
+
+## TFIDF
+risk_word$qq<-ifelse(risk_word$temp=="　","delete","")
+risk_word<- filter(risk_word,qq!="delete")
+risk_word$qq=NULL
+
+risk_TFIDF<-bind_tf_idf(risk_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+risk_TFIDF_top10<-data.frame()
+for (n in 1:264){
+print(n)
+temp<-risk_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+risk_TFIDF_top10<-rbindlist(list(risk_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+risk_name <- select(risk,year,ID,country)
+
+risk_TFIDF_top10<-left_join(risk_name,risk_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+risk_year <- ddply(risk_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##農業
+rice$ID=NULL
+
+rice$ID <- 1:347
+rice_word<-data.frame()
+
+for (n in 1:347){
+print(n)
+temp <-filter(rice,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(rice_word,temp)
+rice_word<-rbindlist(l)
+}
+
+## TFIDF
+rice_word$qq<-ifelse(rice_word$temp=="　","delete","")
+rice_word<- filter(rice_word,qq!="delete")
+rice_word$qq=NULL
+
+rice_TFIDF<-bind_tf_idf(rice_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+rice_TFIDF_top10<-data.frame()
+for (n in 1:347){
+print(n)
+temp<-rice_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+rice_TFIDF_top10<-rbindlist(list(rice_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+rice_name <- select(rice,year,ID,country)
+
+rice_TFIDF_top10<-left_join(rice_name,rice_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+rice_year <- ddply(rice_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##鐵路
+railway$ID=NULL
+
+railway$ID <- 1:813
+railway_word<-data.frame()
+
+for (n in 1:813){
+print(n)
+temp <-filter(railway,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(railway_word,temp)
+railway_word<-rbindlist(l)
+}
+
+## TFIDF
+railway_word$qq<-ifelse(railway_word$temp=="　","delete","")
+railway_word<- filter(railway_word,qq!="delete")
+railway_word$qq=NULL
+
+railway_TFIDF<-bind_tf_idf(railway_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+railway_TFIDF_top10<-data.frame()
+for (n in 1:813){
+print(n)
+temp<-railway_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+railway_TFIDF_top10<-rbindlist(list(railway_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+railway_name <- select(railway,year,ID,country)
+
+railway_TFIDF_top10<-left_join(railway_name,railway_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+railway_year <- ddply(railway_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##出口
+output$ID=NULL
+
+output$ID <- 1:645
+output_word<-data.frame()
+
+for (n in 1:645){
+print(n)
+temp <-filter(output,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(output_word,temp)
+output_word<-rbindlist(l)
+}
+
+## TFIDF
+output_word$qq<-ifelse(output_word$temp=="　","delete","")
+output_word<- filter(output_word,qq!="delete")
+output_word$qq=NULL
+
+output_TFIDF<-bind_tf_idf(output_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+output_TFIDF_top10<-data.frame()
+for (n in 1:645){
+print(n)
+temp<-output_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+output_TFIDF_top10<-rbindlist(list(output_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+output_name <- select(output,year,ID,country)
+
+output_TFIDF_top10<-left_join(output_name,output_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+output_year <- ddply(output_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##石油
+oil$ID=NULL
+
+oil$ID <- 1:312
+oil_word<-data.frame()
+
+for (n in 1:312){
+print(n)
+temp <-filter(oil,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(oil_word,temp)
+oil_word<-rbindlist(l)
+}
+
+## TFIDF
+oil_word$qq<-ifelse(oil_word$temp=="　","delete","")
+oil_word<- filter(oil_word,qq!="delete")
+oil_word$qq=NULL
+
+oil_TFIDF<-bind_tf_idf(oil_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+oil_TFIDF_top10<-data.frame()
+for (n in 1:312){
+print(n)
+temp<-oil_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+oil_TFIDF_top10<-rbindlist(list(oil_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+oil_name <- select(oil,year,ID,country)
+
+oil_TFIDF_top10<-left_join(oil_name,oil_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+oil_year <- ddply(oil_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##中亞
+Midasia$ID=NULL
+
+Midasia$ID <- 1:276
+Midasia_word<-data.frame()
+
+for (n in 1:276){
+print(n)
+temp <-filter(Midasia,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Midasia_word,temp)
+Midasia_word<-rbindlist(l)
+}
+
+## TFIDF
+Midasia_word$qq<-ifelse(Midasia_word$temp=="　","delete","")
+Midasia_word<- filter(Midasia_word,qq!="delete")
+Midasia_word$qq=NULL
+
+Midasia_TFIDF<-bind_tf_idf(Midasia_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Midasia_TFIDF_top10<-data.frame()
+for (n in 1:276){
+print(n)
+temp<-Midasia_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Midasia_TFIDF_top10<-rbindlist(list(Midasia_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Midasia_name <- select(Midasia,year,ID,country)
+
+Midasia_TFIDF_top10<-left_join(Midasia_name,Midasia_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+Midasia_year <- ddply(Midasia_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##貸款
+loan$ID=NULL
+
+loan$ID <- 1:407
+loan_word<-data.frame()
+
+for (n in 1:407){
+print(n)
+temp <-filter(loan,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(loan_word,temp)
+loan_word<-rbindlist(l)
+}
+
+## TFIDF
+loan_word$qq<-ifelse(loan_word$temp=="　","delete","")
+loan_word<- filter(loan_word,qq!="delete")
+loan_word$qq=NULL
+
+loan_TFIDF<-bind_tf_idf(loan_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+loan_TFIDF_top10<-data.frame()
+for (n in 1:407){
+print(n)
+temp<-loan_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+loan_TFIDF_top10<-rbindlist(list(loan_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+loan_name <- select(loan,year,ID,country)
+
+loan_TFIDF_top10<-left_join(loan_name,loan_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+loan_year <- ddply(loan_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##加入
+join$ID=NULL
+
+join$ID <- 1:623
+join_word<-data.frame()
+
+for (n in 1:623){
+print(n)
+temp <-filter(join,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(join_word,temp)
+join_word<-rbindlist(l)
+}
+
+## TFIDF
+join_word$qq<-ifelse(join_word$temp=="　","delete","")
+join_word<- filter(join_word,qq!="delete")
+join_word$qq=NULL
+
+join_TFIDF<-bind_tf_idf(join_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+join_TFIDF_top10<-data.frame()
+for (n in 1:623){
+print(n)
+temp<-join_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+join_TFIDF_top10<-rbindlist(list(join_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+join_name <- select(join,year,ID,country)
+
+join_TFIDF_top10<-left_join(join_name,join_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+join_year <- ddply(join_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##伊朗
+Iran$ID=NULL
+
+Iran$ID <- 1:297
+Iran_word<-data.frame()
+
+for (n in 1:297){
+print(n)
+temp <-filter(Iran,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(Iran_word,temp)
+Iran_word<-rbindlist(l)
+}
+
+## TFIDF
+Iran_word$qq<-ifelse(Iran_word$temp=="　","delete","")
+Iran_word<- filter(Iran_word,qq!="delete")
+Iran_word$qq=NULL
+
+Iran_TFIDF<-bind_tf_idf(Iran_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+Iran_TFIDF_top10<-data.frame()
+for (n in 1:297){
+print(n)
+temp<-Iran_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+Iran_TFIDF_top10<-rbindlist(list(Iran_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+Iran_name <- select(Iran,year,ID,country)
+
+Iran_TFIDF_top10<-left_join(Iran_name,Iran_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+Iran_year <- ddply(Iran_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##投資
+invest$ID=NULL
+
+invest$ID <- 1:2418
+invest_word<-data.frame()
+
+for (n in 1:2418){
+print(n)
+temp <-filter(invest,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(invest_word,temp)
+invest_word<-rbindlist(l)
+}
+
+## TFIDF
+invest_word$qq<-ifelse(invest_word$temp=="　","delete","")
+invest_word<- filter(invest_word,qq!="delete")
+invest_word$qq=NULL
+
+invest_TFIDF<-bind_tf_idf(invest_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+invest_TFIDF_top10<-data.frame()
+for (n in 1:2418){
+print(n)
+temp<-invest_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+invest_TFIDF_top10<-rbindlist(list(invest_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+invest_name <- select(invest,year,ID,country)
+
+invest_TFIDF_top10<-left_join(invest_name,invest_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+invest_year <- ddply(invest_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##印度
+India$ID=NULL
+
+India$ID <- 1:677
+India_word<-data.frame()
+
+for (n in 1:677){
+print(n)
+temp <-filter(India,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(India_word,temp)
+India_word<-rbindlist(l)
+}
+
+## TFIDF
+India_word$qq<-ifelse(India_word$temp=="　","delete","")
+India_word<- filter(India_word,qq!="delete")
+India_word$qq=NULL
+
+India_TFIDF<-bind_tf_idf(India_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+India_TFIDF_top10<-data.frame()
+for (n in 1:677){
+print(n)
+temp<-India_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+India_TFIDF_top10<-rbindlist(list(India_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+India_name <- select(India,year,ID,country)
+
+India_TFIDF_top10<-left_join(India_name,India_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+India_year <- ddply(India_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##印度
+India$ID=NULL
+
+India$ID <- 1:677
+India_word<-data.frame()
+
+for (n in 1:677){
+print(n)
+temp <-filter(India,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(India_word,temp)
+India_word<-rbindlist(l)
+}
+
+## TFIDF
+India_word$qq<-ifelse(India_word$temp=="　","delete","")
+India_word<- filter(India_word,qq!="delete")
+India_word$qq=NULL
+
+India_TFIDF<-bind_tf_idf(India_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+India_TFIDF_top10<-data.frame()
+for (n in 1:677){
+print(n)
+temp<-India_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+India_TFIDF_top10<-rbindlist(list(India_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+India_name <- select(India,year,ID,country)
+
+India_TFIDF_top10<-left_join(India_name,India_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+India_year <- ddply(India_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##加強
+enhance$ID=NULL
+
+enhance$ID <- 1:1332
+enhance_word<-data.frame()
+
+for (n in 1:1332){
+print(n)
+temp <-filter(enhance,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(enhance_word,temp)
+enhance_word<-rbindlist(l)
+}
+
+## TFIDF
+enhance_word$qq<-ifelse(enhance_word$temp=="　","delete","")
+enhance_word<- filter(enhance_word,qq!="delete")
+enhance_word$qq=NULL
+
+enhance_TFIDF<-bind_tf_idf(enhance_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+enhance_TFIDF_top10<-data.frame()
+for (n in 1:1332){
+print(n)
+temp<-enhance_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+enhance_TFIDF_top10<-rbindlist(list(enhance_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+enhance_name <- select(enhance,year,ID,country)
+
+enhance_TFIDF_top10<-left_join(enhance_name,enhance_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+enhance_year <- ddply(enhance_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+##電力
+electricity$ID=NULL
+
+electricity$ID <- 1:164
+electricity_word<-data.frame()
+
+for (n in 1:164){
+print(n)
+temp <-filter(electricity,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(electricity_word,temp)
+electricity_word<-rbindlist(l)
+}
+
+## TFIDF
+electricity_word$qq<-ifelse(electricity_word$temp=="　","delete","")
+electricity_word<- filter(electricity_word,qq!="delete")
+electricity_word$qq=NULL
+
+electricity_TFIDF<-bind_tf_idf(electricity_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+electricity_TFIDF_top10<-data.frame()
+for (n in 1:164){
+print(n)
+temp<-electricity_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+electricity_TFIDF_top10<-rbindlist(list(electricity_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+electricity_name <- select(electricity,year,ID,country)
+
+electricity_TFIDF_top10<-left_join(electricity_name,electricity_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+electricity_year <- ddply(electricity_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##經濟
+economic$ID=NULL
+
+economic$ID <- 1:3597
+economic_word<-data.frame()
+
+for (n in 1:3597){
+print(n)
+temp <-filter(economic,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(economic_word,temp)
+economic_word<-rbindlist(l)
+}
+
+## TFIDF
+economic_word$qq<-ifelse(economic_word$temp=="　","delete","")
+economic_word<- filter(economic_word,qq!="delete")
+economic_word$qq=NULL
+
+economic_TFIDF<-bind_tf_idf(economic_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+economic_TFIDF_top10<-data.frame()
+for (n in 1:3597){
+print(n)
+temp<-economic_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+economic_TFIDF_top10<-rbindlist(list(economic_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+economic_name <- select(economic,year,ID,country)
+
+economic_TFIDF_top10<-left_join(economic_name,economic_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+economic_year <- ddply(economic_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##債務
+debt$ID=NULL
+
+debt$ID <- 1:500
+debt_word<-data.frame()
+
+for (n in 1:500){
+print(n)
+temp <-filter(debt,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(debt_word,temp)
+debt_word<-rbindlist(l)
+}
+
+## TFIDF
+debt_word$qq<-ifelse(debt_word$temp=="　","delete","")
+debt_word<- filter(debt_word,qq!="delete")
+debt_word$qq=NULL
+
+debt_TFIDF<-bind_tf_idf(debt_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+debt_TFIDF_top10<-data.frame()
+for (n in 1:500){
+print(n)
+temp<-debt_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+debt_TFIDF_top10<-rbindlist(list(debt_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+debt_name <- select(debt,year,ID,country)
+
+debt_TFIDF_top10<-left_join(debt_name,debt_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+debt_year <- ddply(debt_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##合作
+cooperate$ID=NULL
+
+cooperate$ID <- 1:3978
+cooperate_word<-data.frame()
+
+for (n in 1:3978){
+print(n)
+temp <-filter(cooperate,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(cooperate_word,temp)
+cooperate_word<-rbindlist(l)
+}
+
+## TFIDF
+cooperate_word$qq<-ifelse(cooperate_word$temp=="　","delete","")
+cooperate_word<- filter(cooperate_word,qq!="delete")
+cooperate_word$qq=NULL
+
+cooperate_TFIDF<-bind_tf_idf(cooperate_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+cooperate_TFIDF_top10<-data.frame()
+for (n in 1:3978){
+print(n)
+temp<-cooperate_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+cooperate_TFIDF_top10<-rbindlist(list(cooperate_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+cooperate_name <- select(cooperate,year,ID,country)
+
+cooperate_TFIDF_top10<-left_join(cooperate_name,cooperate_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+cooperate_year <- ddply(cooperate_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##交流
+comminicate$ID=NULL
+
+comminicate$ID <- 1:757
+comminicate_word<-data.frame()
+
+for (n in 1:757){
+print(n)
+temp <-filter(comminicate,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(comminicate_word,temp)
+comminicate_word<-rbindlist(l)
+}
+
+## TFIDF
+comminicate_word$qq<-ifelse(comminicate_word$temp=="　","delete","")
+comminicate_word<- filter(comminicate_word,qq!="delete")
+comminicate_word$qq=NULL
+
+comminicate_TFIDF<-bind_tf_idf(comminicate_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+comminicate_TFIDF_top10<-data.frame()
+for (n in 1:757){
+print(n)
+temp<-comminicate_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+comminicate_TFIDF_top10<-rbindlist(list(comminicate_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+comminicate_name <- select(comminicate,year,ID,country)
+
+comminicate_TFIDF_top10<-left_join(comminicate_name,comminicate_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+comminicate_year <- ddply(comminicate_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+##交易
+business$ID=NULL
+
+business$ID <- 1:394
+business_word<-data.frame()
+
+for (n in 1:394){
+print(n)
+temp <-filter(business,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(business_word,temp)
+business_word<-rbindlist(l)
+}
+
+## TFIDF
+business_word$qq<-ifelse(business_word$temp=="　","delete","")
+business_word<- filter(business_word,qq!="delete")
+business_word$qq=NULL
+
+business_TFIDF<-bind_tf_idf(business_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+business_TFIDF_top10<-data.frame()
+for (n in 1:394){
+print(n)
+temp<-business_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+business_TFIDF_top10<-rbindlist(list(business_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+business_name <- select(business,year,ID,country)
+
+business_TFIDF_top10<-left_join(business_name,business_TFIDF_top10,by="ID") 
+
+
+##依年份統計關鍵字
+business_year <- ddply(business_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+write.csv(srilanka_year, "srilanka_year.csv", row.names = FALSE)
+write.csv(US_year, "US_year.csv", row.names = FALSE)
+write.csv(Russia_year, "Russia_year.csv", row.names = FALSE)
+write.csv(Iran_year, "Iran_year.csv", row.names = FALSE)
+write.csv(Midasia_year, "Midasia_year.csv", row.names = FALSE)
+write.csv(India_year, "India_year.csv", row.names = FALSE)
+write.csv(Soulatin_year, "Soulatin_year.csv", row.names = FALSE)
+write.csv(Ukraine_year, "Ukraine_year.csv", row.names = FALSE)
+write.csv(railway_year, "railway_year.csv", row.names = FALSE)
+write.csv(rice_year, "rice_year.csv", row.names = FALSE)
+write.csv(oil_year, "oil_year.csv", row.names = FALSE)
+write.csv(electricity_year, "electricity_year.csv", row.names = FALSE)
+write.csv(debt_year, "debt_year.csv", row.names = FALSE)
+write.csv(invest_year, "invest_year.csv", row.names = FALSE)
+write.csv(economic_year, "economic_year.csv", row.names = FALSE)
+write.csv(trading_year, "trading_year.csv", row.names = FALSE)
+write.csv(risk_year, "risk_year.csv", row.names = FALSE)
+write.csv(business_year, "business_year.csv", row.names = FALSE)
+write.csv(loan_year, "loan_year.csv", row.names = FALSE)
+write.csv(output_year, "output_year.csv", row.names = FALSE)
+write.csv(join_year, "join_year.csv", row.names = FALSE)
+write.csv(comminicate_year, "comminicate_year.csv", row.names = FALSE)
+write.csv(cooperate_year, "cooperate_year.csv", row.names = FALSE)
+write.csv(enhance_year, "enhance_year.csv", row.names = FALSE)
+write.csv(strategy_year, "strategy_year.csv", row.names = FALSE)
+write.csv(threaten_year, "threaten_year.csv", row.names = FALSE)
+```
+
+#最後要做情緒分析，把10000筆的貼文切成三小包
+```{r}
+#新增一個空的列表，用於儲存分割後的小包
+small_dfs <- list()
+
+# 每個小包的筆數
+chunk_size <- 3600
+
+# 計算總共需要多少小包
+num_chunks <- ceiling(nrow(all) / chunk_size)
+
+# 循環分割
+for (i in 1:num_chunks) {
+  # 計算當前小包的起始和结束列數
+  start_row <- (i - 1) * chunk_size + 1
+  end_row <- min(i * chunk_size, nrow(all))  # 處理最後一個小包
+  
+  # 提取當前小包的數據
+  small_df <- all[start_row:end_row, ]
+  
+  # 將小包添加到列表中
+  small_dfs[[i]] <- small_df
+}
+
+# 新增3個新的dataframe，各自對應一個小包
+all_1 <- small_dfs[[1]]
+all_2 <- small_dfs[[2]]
+all_3 <- small_dfs[[3]]
+
+write.csv(all_1, "all_1.csv", row.names = FALSE)
+write.csv(all_2, "all_2.csv", row.names = FALSE)
+write.csv(all_3, "all_3.csv", row.names = FALSE)
+
+```
