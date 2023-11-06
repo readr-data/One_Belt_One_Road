@@ -32,27 +32,12 @@ colnames(all_country)[2] <- 'all_count'
 yes_country<-merge(yes_country,all_country)
 yes_country$percentage <- paste(round((yes_country$count / yes_country$all_count) * 100, 2), "%", sep = "")
 
-yes_korea<-filter(yes,country=="韓國")
-yes_thai<-filter(yes,country=="泰國")
-yes_egypt<-filter(yes,country=="埃及")
-yes_phil<-filter(yes,country=="菲律賓")
-yes_viet<-filter(yes,country=="越南")
-yes_myanmar<-filter(yes,country=="緬甸")
-yes_russia<-filter(yes,country=="俄羅斯")
-yes_sing<-filter(yes,country=="新加坡")
-yes_syria<-filter(yes,country=="敘利亞")
-yes_italy<-filter(yes,country=="義大利")
+country_top10<-data.frame(cn=c("韓國","泰國","埃及","菲律賓","越南","緬甸","俄羅斯","新加坡","敘利亞","義大利"),en=c("korea","thai","egypt","phil","viet","myanmar","russia","sing","syria","italy"))
 
-write.csv(yes_korea, "yes_korea.csv", row.names = FALSE)
-write.csv(yes_thai, "yes_thai.csv", row.names = FALSE)
-write.csv(yes_egypt, "yes_egypt.csv", row.names = FALSE)
-write.csv(yes_phil, "yes_phil.csv", row.names = FALSE)
-write.csv(yes_viet, "yes_viet.csv", row.names = FALSE)
-write.csv(yes_myanmar, "yes_myanmar.csv", row.names = FALSE)
-write.csv(yes_russia, "yes_russia.csv", row.names = FALSE)
-write.csv(yes_sing, "yes_sing.csv", row.names = FALSE)
-write.csv(yes_syria, "yes_syria.csv", row.names = FALSE)
-write.csv(yes_italy, "yes_italy.csv", row.names = FALSE)
+for(q in 1:nrow(country_top10)){
+  temp<-filter(yes,country==country_top10$cn[q]) #先統一存成 temp，用變數 q 去控制國家名
+  write.csv(temp,paste0("yes_",country_top10$en[q],".csv"),row.names = FALSE)
+}
 
 #負面國家top10
 no_country<-ddply(no,.(country),summarize,count=length(country))
