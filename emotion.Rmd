@@ -1,0 +1,715 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+#這篇專門for情緒分析
+```{r}
+library(data.table)
+library(bigreadr)
+library(tidyr)
+library(dplyr)
+library(plyr)
+```
+```{r}
+# 開一個新欄位 a ，把 ai 欄位的資料做分類
+all$a <- ifelse(grepl("是正面的|被視為正面|持正面情绪", all$ai, ignore.case = TRUE), "是正面的",
+         ifelse(grepl("是負面的|是负面的|被視為負面|被視為负面|持负面情绪", all$ai, ignore.case = TRUE), "是負面的",
+         ifelse(grepl("無法確定|很難確定|無法直接判斷|无法直接访问|閱讀文章", all$ai, ignore.case = TRUE), "無法辨識", "是中性的")))
+
+
+yes <-filter(all,a=="是正面的")
+no <-filter(all,a=="是負面的"|a=="是负面的")
+middle <-filter(all,a=="是中性的")
+wait<-filter(all,a=="無法辨識")
+
+```
+
+```{r}
+#正面國家 top10
+yes_country<-ddply(yes,.(country),summarize,count=length(country))
+all_country<-ddply(all,.(country),summarize,count=length(country))
+colnames(all_country)[2] <- 'all_count'
+yes_country<-merge(yes_country,all_country)
+yes_country$percentage <- paste(round((yes_country$count / yes_country$all_count) * 100, 2), "%", sep = "")
+
+country_top10<-data.frame(cn=c("韓國","泰國","埃及","菲律賓","越南","緬甸","俄羅斯","新加坡","敘利亞","義大利"),en=c("korea","thai","egypt","phil","viet","myanmar","russia","sing","syria","italy"))
+
+for(q in 1:nrow(country_top10)){
+  temp<-filter(yes,country==country_top10$cn[q]) #先統一存成 temp，用變數 q 去控制國家名
+  write.csv(temp,paste0("yes_",country_top10$en[q],".csv"),row.names = FALSE)
+}
+
+#負面國家top10
+no_country<-ddply(no,.(country),summarize,count=length(country))
+no_country<-merge(no_country,all_country)
+no_country$percentage <- paste(round((no_country$count / no_country$all_count) * 100, 2), "%", sep = "")
+
+yes_korea<-filter(yes,country=="韓國")
+yes_thai<-filter(yes,country=="泰國")
+yes_egypt<-filter(yes,country=="埃及")
+yes_phil<-filter(yes,country=="菲律賓")
+yes_viet<-filter(yes,country=="越南")
+yes_myanmar<-filter(yes,country=="緬甸")
+yes_russia<-filter(yes,country=="俄羅斯")
+yes_sing<-filter(yes,country=="新加坡")
+yes_syria<-filter(yes,country=="敘利亞")
+yes_italy<-filter(yes,country=="義大利")
+
+write.csv(yes_korea, "yes_korea.csv", row.names = FALSE)
+write.csv(yes_thai, "yes_thai.csv", row.names = FALSE)
+write.csv(yes_egypt, "yes_egypt.csv", row.names = FALSE)
+write.csv(yes_phil, "yes_phil.csv", row.names = FALSE)
+write.csv(yes_viet, "yes_viet.csv", row.names = FALSE)
+write.csv(yes_myanmar, "yes_myanmar.csv", row.names = FALSE)
+write.csv(yes_russia, "yes_russia.csv", row.names = FALSE)
+write.csv(yes_sing, "yes_sing.csv", row.names = FALSE)
+write.csv(yes_syria, "yes_syria.csv", row.names = FALSE)
+write.csv(yes_italy, "yes_italy.csv", row.names = FALSE)
+```
+
+```{r}
+#刪去「無法辨識」資料中，含有網址的內容
+wait$message_zh <- gsub("^http://.*$", "", wait$message_zh)
+wait$message_zh <- gsub("^https://.*$", "", wait$message_zh)
+write.csv(wait, "wait.csv", row.names = FALSE)
+
+#無法辨識的貼文重新跑完 python 情緒分析後，再放回來分類
+wait_ai$a=NULL
+
+wait_ai$a <- ifelse(grepl("是正面的|被視為正面|持正面情绪", wait_ai$ai, ignore.case = TRUE), "是正面的",
+         ifelse(grepl("是負面的|是负面的|被視為負面|被視為负面|持负面情绪", wait_ai$ai, ignore.case = TRUE), "是負面的",
+         ifelse(grepl("無法確定|很難確定|無法直接判斷|无法直接访问|閱讀文章", wait_ai$ai, ignore.case = TRUE), "無法辨識", "是中性的")))
+
+yes_s <-filter(wait_ai,a=="是正面的")
+no_s <-filter(wait_ai,a=="是負面的"|a=="是负面的")
+middle_s <-filter(wait_ai,a=="是中性的")
+wait_s<-filter(wait_ai,a=="無法辨識")
+
+yes<-rbind(yes,yes_s)
+no<-rbind(no,no_s)
+middle<-rbind(middle,middle_s)
+
+```
+
+#標記出中國國營媒體的報導，在正面情緒的比例上予以排除
+```{r}
+library(RSelenium)
+library(rvest)
+library(dplyr)
+library(data.table)
+library(magrittr)
+```
+
+```{r}
+cd /Users/mac/Downloads
+java -jar selenium-server-standalone-3.141.59.jar 
+```
+
+# selenium 設定
+```{r}
+remDr <- remoteDriver(
+  remoteServerAddr = "localhost",
+  port = 4444,
+  browserName = "chrome")
+```
+
+##跑迴圈
+```{r}
+yes$check<-""
+for(q in 1:nrow(yes)){
+  print(q)
+  remDr$open()
+  remDr$navigate(yes$url[q])
+  Sys.sleep(1)
+  page_source <- remDr$getPageSource()[[1]]
+  soup <- read_html(page_source)
+  yes$check[q]<-ifelse(grepl("中國國營媒體",soup)==TRUE,"y","n") 
+  Sys.sleep(1)
+  remDr$close()
+}
+```
+
+#找出貼文數的中位數，然後篩掉不足中位數的國家，剩下的國家看正負面情緒 top10
+```{r}
+yes_pure <-filter(yes,check=="n")#篩出非中國官媒的貼文
+median_value <- median(yes_country$all_count)#所有國家的中位數
+
+#正面國家top10
+yes_country<-ddply(yes_pure,.(country),summarize,count=length(country))
+yes_country<-full_join(yes_country,all_country)
+yes_country <- yes_country[-(127),]
+yes_country <- yes_country[-(131),]
+yes_country[7,3] <- '744'
+yes_final <- yes_country[yes_country$all_count>= "25", ] #篩選出大於中位數的國家
+yes_final$percentage <- paste(round((as.numeric(yes_final$count) / as.numeric(yes_final$all_count)) * 100, 2), "%", sep = "")
+
+#負面國家top10
+no_country<-ddply(no,.(country),summarize,count=length(country))
+no_country<-full_join(no_country,all_country)
+no_country <- no_country[-(95),]
+no_final <- no_country[no_country$all_count >= 25, ] #篩選出大於中位數的國家
+no_final$percentage <- paste(round((as.numeric(no_final$count) / as.numeric(no_final$all_count)) * 100, 1), "%", sep = "")
+```
+
+#各自做TFIDF找出關鍵字
+```{r}
+library(tidytext)
+library(tidyverse)
+library(vctrs)
+library(jiebaR)
+library(dplyr)
+library(stringr)
+library(data.table)
+library(plyr)
+```
+```{r}
+wordbank <- read.csv("wordbank.csv")
+cc=worker(stop_word = "cn_stopwords.txt")
+for(n in 1:nrow(wordbank)){
+  new_user_word(cc,wordbank$word[n])
+} 
+
+test<-"陳培哲蔡英文黃國昌與你"
+test_final<-cc[test]
+```
+
+```{r}
+positive <- filter(yes_pure,country=="茅利塔尼亞"|country=="波札那"|country=="巴基斯坦"|country=="吉布地"|country=="寮國"|country=="阿富汗"|country=="巴勒斯坦"|country=="尼加拉瓜"|country=="柬埔寨"|country=="衣索比亞")
+
+negative <- filter(no,country=="烏克蘭"|country=="保加利亞"|country=="薩爾瓦多"|country=="紐西蘭"|country=="斯里蘭卡"|country=="阿爾巴尼亞"|country=="尚比亞"|country=="越南"|country=="南非"|country=="匈牙利")
+
+#正面貼文關鍵字
+
+positive$ID <- 1:436
+positive_word<-data.frame()
+
+for (n in 1:436){
+print(n)
+temp <-filter(positive,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(positive_word,temp)
+positive_word<-rbindlist(l)
+}
+
+## TFIDF
+positive_word$qq<-ifelse(positive_word$temp=="　","delete","")
+positive_word<- filter(positive_word,qq!="delete")
+positive_word$qq=NULL
+
+positive_TFIDF<-bind_tf_idf(positive_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+positive_TFIDF_top10<-data.frame()
+for (n in 1:436){
+print(n)
+temp<-positive_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+positive_TFIDF_top10<-rbindlist(list(positive_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+positive_name <- select(positive,date,ID,country)
+
+positive_TFIDF_top10<-left_join(positive_name,positive_TFIDF_top10,by="ID") 
+
+positive_TFIDF_top10$year<-substr(positive_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+positive_year <- ddply(positive_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+
+#負面貼文關鍵字
+negative$ID <- 1:364
+negative_word<-data.frame()
+
+for (n in 1:364){
+print(n)
+temp <-filter(negative,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(negative_word,temp)
+negative_word<-rbindlist(l)
+}
+
+## TFIDF
+negative_word$qq<-ifelse(negative_word$temp=="　","delete","")
+negative_word<- filter(negative_word,qq!="delete")
+negative_word$qq=NULL
+
+negative_TFIDF<-bind_tf_idf(negative_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+negative_TFIDF_top10<-data.frame()
+for (n in 1:364){
+print(n)
+temp<-negative_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+negative_TFIDF_top10<-rbindlist(list(negative_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+negative_name <- select(negative,date,ID,country)
+
+negative_TFIDF_top10<-left_join(negative_name,negative_TFIDF_top10,by="ID") 
+
+negative_TFIDF_top10$year<-substr(negative_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+negative_year <- ddply(negative_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+write.csv(positive, "positive.csv", row.names = FALSE)
+write.csv(positive_year, "positive_year.csv", row.names = FALSE)
+write.csv(negative, "negative.csv", row.names = FALSE)
+write.csv(negative_year, "negative_year.csv", row.names = FALSE)
+```
+#計算指定國家的歷年負面貼文％
+```{r}
+#烏克蘭
+all$year<-substr(all$date,1,4)
+Ukraine <- filter(all,country=="烏克蘭")
+year_Ukraine<-ddply(Ukraine,.(year),summarize,count=length(year))
+
+no$year<-substr(no$date,1,4)
+no_Ukraine <- filter(no,country=="烏克蘭")
+no_year_Ukraine<-ddply(no_Ukraine,.(year),summarize,count=length(year))
+
+colnames(year_Ukraine)[2] <- 'all_count'
+no_year_Ukraine<-full_join(no_year_Ukraine,year_Ukraine)
+no_year_Ukraine$percentage <- paste(round((as.numeric(no_year_Ukraine$count) / as.numeric(no_year_Ukraine$all_count)) * 100, 2), "%", sep = "")
+
+#保加利亞
+Bulgaria <- filter(all,country=="保加利亞")
+year_Bulgaria<-ddply(Bulgaria,.(year),summarize,count=length(year))
+
+no_Bulgaria <- filter(no,country=="保加利亞")
+no_year_Bulgaria<-ddply(no_Bulgaria,.(year),summarize,count=length(year))
+
+colnames(year_Bulgaria)[2] <- 'all_count'
+no_year_Bulgaria<-full_join(no_year_Bulgaria,year_Bulgaria)
+no_year_Bulgaria$percentage <- paste(round((as.numeric(no_year_Bulgaria$count) / as.numeric(no_year_Bulgaria$all_count)) * 100, 2), "%", sep = "")
+
+#薩爾瓦多
+Salvador <- filter(all,country=="薩爾瓦多")
+year_Salvador<-ddply(Salvador,.(year),summarize,count=length(year))
+
+no_Salvador <- filter(no,country=="薩爾瓦多")
+no_year_Salvador<-ddply(no_Salvador,.(year),summarize,count=length(year))
+
+colnames(year_Salvador)[2] <- 'all_count'
+no_year_Salvador<-full_join(no_year_Salvador,year_Salvador)
+no_year_Salvador$percentage <- paste(round((as.numeric(no_year_Salvador$count) / as.numeric(no_year_Salvador$all_count)) * 100, 2), "%", sep = "")
+
+#紐西蘭
+Zealand <- filter(all,country=="紐西蘭")
+year_Zealand<-ddply(Zealand,.(year),summarize,count=length(year))
+
+no_Zealand <- filter(no,country=="紐西蘭")
+no_year_Zealand<-ddply(no_Zealand,.(year),summarize,count=length(year))
+
+colnames(year_Zealand)[2] <- 'all_count'
+no_year_Zealand<-full_join(no_year_Zealand,year_Zealand)
+no_year_Zealand$percentage <- paste(round((as.numeric(no_year_Zealand$count) / as.numeric(no_year_Zealand$all_count)) * 100, 2), "%", sep = "")
+
+#斯里蘭卡
+SriLanka <- filter(all,country=="斯里蘭卡")
+year_SriLanka<-ddply(SriLanka,.(year),summarize,count=length(year))
+
+no_SriLanka <- filter(no,country=="斯里蘭卡")
+no_year_SriLanka<-ddply(no_SriLanka,.(year),summarize,count=length(year))
+
+colnames(year_SriLanka)[2] <- 'all_count'
+no_year_SriLanka<-full_join(no_year_SriLanka,year_SriLanka)
+no_year_SriLanka$percentage <- paste(round((as.numeric(no_year_SriLanka$count) / as.numeric(no_year_SriLanka$all_count)) * 100, 2), "%", sep = "")
+
+#阿爾巴尼亞
+Albania <- filter(all,country=="阿爾巴尼亞")
+year_Albania<-ddply(Albania,.(year),summarize,count=length(year))
+
+no_Albania <- filter(no,country=="阿爾巴尼亞")
+no_year_Albania<-ddply(no_Albania,.(year),summarize,count=length(year))
+
+colnames(year_Albania)[2] <- 'all_count'
+no_year_Albania<-full_join(no_year_Albania,year_Albania)
+no_year_Albania$percentage <- paste(round((as.numeric(no_year_Albania$count) / as.numeric(no_year_Albania$all_count)) * 100, 2), "%", sep = "")
+
+#尚比亞
+Zambia <- filter(all,country=="尚比亞")
+year_Zambia<-ddply(Zambia,.(year),summarize,count=length(year))
+
+no_Zambia <- filter(no,country=="尚比亞")
+no_year_Zambia<-ddply(no_Zambia,.(year),summarize,count=length(year))
+
+colnames(year_Zambia)[2] <- 'all_count'
+no_year_Zambia<-full_join(no_year_Zambia,year_Zambia)
+no_year_Zambia$percentage <- paste(round((as.numeric(no_year_Zambia$count) / as.numeric(no_year_Zambia$all_count)) * 100, 2), "%", sep = "")
+
+#越南
+Vietnam <- filter(all,country=="越南")
+Vietnam$year<-substr(Vietnam$date,1,4)
+year_Vietnam<-ddply(Vietnam,.(year),summarize,count=length(year))
+
+no_Vietnam <- filter(no,country=="越南")
+no_Vietnam$year<-substr(no_Vietnam$date,1,4)
+no_year_Vietnam<-ddply(no_Vietnam,.(year),summarize,count=length(year))
+
+colnames(year_Vietnam)[2] <- 'all_count'
+no_year_Vietnam<-full_join(no_year_Vietnam,year_Vietnam)
+no_year_Vietnam$percentage <- paste(round((as.numeric(no_year_Vietnam$count) / as.numeric(no_year_Vietnam$all_count)) * 100, 2), "%", sep = "")
+
+#南非
+SouthAfrica <- filter(all,country=="南非")
+year_SouthAfrica<-ddply(SouthAfrica,.(year),summarize,count=length(year))
+
+no_SouthAfrica <- filter(no,country=="南非")
+no_year_SouthAfrica<-ddply(no_SouthAfrica,.(year),summarize,count=length(year))
+
+colnames(year_SouthAfrica)[2] <- 'all_count'
+no_year_SouthAfrica<-full_join(no_year_SouthAfrica,year_SouthAfrica)
+no_year_SouthAfrica$percentage <- paste(round((as.numeric(no_year_SouthAfrica$count) / as.numeric(no_year_SouthAfrica$all_count)) * 100, 2), "%", sep = "")
+
+#匈牙利
+Hungary <- filter(all,country=="匈牙利")
+year_Hungary<-ddply(Hungary,.(year),summarize,count=length(year))
+
+no_Hungary <- filter(no,country=="匈牙利")
+no_year_Hungary<-ddply(no_Hungary,.(year),summarize,count=length(year))
+
+colnames(year_Hungary)[2] <- 'all_count'
+no_year_Hungary<-full_join(no_year_Hungary,year_Hungary)
+no_year_Hungary$percentage <- paste(round((as.numeric(no_year_Hungary$count) / as.numeric(no_year_Hungary$all_count)) * 100, 2), "%", sep = "")
+
+```
+
+#中國官媒的行為
+```{r}
+#中國官媒的各國情緒貼文數量
+korea <-filter(china_official,country=="韓國")
+vietnam <-filter(china_official,country=="越南")
+thailand <-filter(china_official,country=="泰國")
+indo <-filter(china_official,country=="印尼")
+myanmar <-filter(china_official,country=="緬甸")
+egypt <-filter(china_official,country=="埃及")
+kenya <-filter(china_official,country=="肯亞")
+senegal <-filter(china_official,country=="塞內加爾")
+
+year_korea<-ddply(korea,.(year),summarize,count=length(year))
+year_vietnam<-ddply(vietnam,.(year),summarize,count=length(year))
+year_thailand<-ddply(thailand,.(year),summarize,count=length(year))
+year_indo<-ddply(indo,.(year),summarize,count=length(year))
+year_myanmar<-ddply(myanmar,.(year),summarize,count=length(year))
+year_egypt<-ddply(egypt,.(year),summarize,count=length(year))
+year_kenya<-ddply(kenya,.(year),summarize,count=length(year))
+year_senegal<-ddply(senegal,.(year),summarize,count=length(year))
+
+#指定國家的正面情緒貼文
+yes_korea <-filter(yes,country=="韓國")
+yes_vietnam <-filter(yes,country=="越南")
+yes_thailand <-filter(yes,country=="泰國")
+yes_indo <-filter(yes,country=="印尼")
+yes_myanmar <-filter(yes,country=="緬甸")
+yes_egypt <-filter(yes,country=="埃及")
+yes_kenya <-filter(yes,country=="肯亞")
+yes_senegal <-filter(yes,country=="塞內加爾")
+
+#統整一下日期格式
+yes_vietnam$date<- as.Date(yes_vietnam$date, origin = "1899-12-30", format = "%Y-%m-%d")
+yes_myanmar$date <- as.Date(yes_myanmar$date, origin = "1899-12-30", format = "%Y-%m-%d")
+yes_kenya$date <- as.Date(yes_kenya$date, origin = "1899-12-30", format = "%Y-%m-%d")
+
+yyes_korea<-ddply(yes_korea,.(year),summarize,count=length(year))
+yyes_vietnam<-ddply(yes_vietnam,.(year),summarize,count=length(year))
+yyes_thailand<-ddply(yes_thailand,.(year),summarize,count=length(year))
+yyes_indo<-ddply(yes_indo,.(year),summarize,count=length(year))
+yyes_myanmar<-ddply(yes_myanmar,.(year),summarize,count=length(year))
+yyes_egypt<-ddply(yes_egypt,.(year),summarize,count=length(year))
+yyes_kenya<-ddply(yes_kenya,.(year),summarize,count=length(year))
+yyes_senegal<-ddply(yes_senegal,.(year),summarize,count=length(year))
+
+colnames(yyes_korea)[2] <- 'all_count'
+colnames(yyes_vietnam)[2] <- 'all_count'
+colnames(yyes_thailand)[2] <- 'all_count'
+colnames(yyes_indo)[2] <- 'all_count'
+colnames(yyes_myanmar)[2] <- 'all_count'
+colnames(yyes_egypt)[2] <- 'all_count'
+colnames(yyes_kenya)[2] <- 'all_count'
+colnames(yyes_senegal)[2] <- 'all_count'
+
+year_korea<-full_join(year_korea,yyes_korea)
+year_vietnam<-full_join(year_vietnam,yyes_vietnam)
+year_thailand<-full_join(year_thailand,yyes_thailand)
+year_indo<-full_join(year_indo,yyes_indo)
+year_myanmar<-full_join(year_myanmar,yyes_myanmar)
+year_egypt<-full_join(year_egypt,yyes_egypt)
+year_kenya<-full_join(year_kenya,yyes_kenya)
+year_senegal<-full_join(year_senegal,yyes_senegal)
+
+year_korea$percentage <- paste(round((as.numeric(year_korea$count) / as.numeric(year_korea$all_count)) * 100, 1), "%", sep = "")
+year_vietnam$percentage <- paste(round((as.numeric(year_vietnam$count) / as.numeric(year_vietnam$all_count)) * 100, 1), "%", sep = "")
+year_thailand$percentage <- paste(round((as.numeric(year_thailand$count) / as.numeric(year_thailand$all_count)) * 100, 1), "%", sep = "")
+year_indo$percentage <- paste(round((as.numeric(year_indo$count) / as.numeric(year_indo$all_count)) * 100, 1), "%", sep = "")
+year_myanmar$percentage <- paste(round((as.numeric(year_myanmar$count) / as.numeric(year_myanmar$all_count)) * 100, 1), "%", sep = "")
+year_egypt$percentage <- paste(round((as.numeric(year_egypt$count) / as.numeric(year_egypt$all_count)) * 100, 1), "%", sep = "")
+year_kenya$percentage <- paste(round((as.numeric(year_kenya$count) / as.numeric(year_kenya$all_count)) * 100, 1), "%", sep = "")
+year_senegal$percentage <- paste(round((as.numeric(year_senegal$count) / as.numeric(year_senegal$all_count)) * 100, 1), "%", sep = "")
+
+
+#關鍵字
+off$date<- as.Date(off$date, origin = "1899-12-30", format = "%Y-%m-%d")
+
+off$ID <- 1:1394
+off_word<-data.frame()
+
+for (n in 1:1394){
+print(n)
+temp <-filter(off,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(off_word,temp)
+off_word<-rbindlist(l)
+}
+
+## TFIDF
+off_word$qq<-ifelse(off_word$temp=="　","delete","")
+off_word<- filter(off_word,qq!="delete")
+off_word$qq=NULL
+
+off_TFIDF<-bind_tf_idf(off_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+off_TFIDF_top10<-data.frame()
+for (n in 1:1394){
+print(n)
+temp<-off_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+off_TFIDF_top10<-rbindlist(list(off_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+off_name <- select(off,date,ID,country)
+
+off_TFIDF_top10<-left_join(off_name,off_TFIDF_top10,by="ID") 
+
+off_TFIDF_top10$year<-substr(off_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+off_year <- ddply(off_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+```
+
+#嘗試：
+```{r}
+#負面貼文數量
+no$year<-substr(no$date,1,4)
+no_year<-ddply(no,.(year),summarize,count=length(year))
+
+#負面貼文關鍵字
+no$date<- as.Date(no$date, origin = "1899-12-30", format = "%Y-%m-%d")
+
+no$ID <- 1:1392
+no_word<-data.frame()
+
+for (n in 1:1392){
+print(n)
+temp <-filter(no,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(no_word,temp)
+no_word<-rbindlist(l)
+}
+
+## TFIDF
+no_word$qq<-ifelse(no_word$temp=="　","delete","")
+no_word<- filter(no_word,qq!="delete")
+no_word$qq=NULL
+
+no_TFIDF<-bind_tf_idf(no_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+no_TFIDF_top10<-data.frame()
+for (n in 1:1392){
+print(n)
+temp<-no_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+no_TFIDF_top10<-rbindlist(list(no_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+no_name <- select(no,date,ID,country)
+
+no_TFIDF_top10<-left_join(no_name,no_TFIDF_top10,by="ID") 
+
+no_TFIDF_top10$year<-substr(no_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+no_year <- ddply(no_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+#正面貼文數量
+yes$date<- as.Date(yes$date, origin = "1899-12-30", format = "%Y-%m-%d")
+yes$year<-substr(yes$date,1,4)
+yes_year<-ddply(yes,.(year),summarize,count=length(year))
+
+#正面貼文關鍵字
+yes$ID <- 1:7183
+yes_word<-data.frame()
+
+for (n in 1:7183){
+print(n)
+temp <-filter(yes,ID==n)
+temp<-temp$message_zh
+  if (is.na(temp)==TRUE)
+    next
+temp<-cc[temp]
+temp<-data.frame(table(temp))
+temp<-temp[order(temp$Freq,decreasing = T),]
+temp$ID<-n
+l<-list(yes_word,temp)
+yes_word<-rbindlist(l)
+}
+
+## TFIDF
+yes_word$qq<-ifelse(yes_word$temp=="　","delete","")
+yes_word<- filter(yes_word,qq!="delete")
+yes_word$qq=NULL
+
+yes_TFIDF<-bind_tf_idf(yes_word, temp, ID, Freq)
+
+##先拿每篇分數最高的 10 個
+yes_TFIDF_top10<-data.frame()
+for (n in 1:7183){
+print(n)
+temp<-yes_TFIDF[ID==n,]
+temp<-temp[order(tf_idf,decreasing = T),]
+temp<-temp[1:10,]
+yes_TFIDF_top10<-rbindlist(list(yes_TFIDF_top10,temp))
+}
+
+##從原本的檔案抓出日期、po文者，然後用 ID 合併在一起
+yes_name <- select(yes,date,ID,country)
+
+yes_TFIDF_top10<-left_join(yes_name,yes_TFIDF_top10,by="ID") 
+
+yes_TFIDF_top10$year<-substr(yes_TFIDF_top10$date,1,4)
+
+##依年份統計關鍵字
+yes_year <- ddply(yes_TFIDF_top10, c("year", "temp"), summarize, count = length(temp))
+
+```
+#每年每個國家的正負面貼文比較
+```{r}
+yes_country<-ddply(yes,.(country),summarize,count=length(country))
+no_country<-ddply(no,.(country),summarize,count=length(country))
+colnames(yes_country)[2] <- 'yes_count'
+colnames(no_country)[2] <- 'no_count'
+
+compare_country<-full_join(yes_country,no_country)
+compare_country<-full_join(compare_country,all_country)
+
+#官媒正面貼文比較
+##韓國
+colnames(year_korea)[2] <- 'china_official'
+colnames(year_korea)[3] <- 'korea_positive'
+colnames(yes_year)[2] <- 'all_count'
+year_korea<-full_join(year_korea,yes_year)
+year_korea$percentage_all <- paste(round((as.numeric(year_korea$china_official) / as.numeric(year_korea$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_korea, "year_korea.csv", row.names = FALSE)
+
+no_korea <-filter(no,country=="韓國")
+no_korea_year<-ddply(no_korea,.(year),summarize,count=length(year))
+
+##越南
+colnames(year_vietnam)[2] <- 'china_official'
+colnames(year_vietnam)[3] <- 'vietnam_positive'
+year_vietnam<-full_join(year_vietnam,yes_year)
+year_vietnam$percentage_all <- paste(round((as.numeric(year_vietnam$china_official) / as.numeric(year_vietnam$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_vietnam, "year_vietnam.csv", row.names = FALSE)
+
+no_vietnam <-filter(no,country=="越南")
+no_vietnam_year<-ddply(no_vietnam,.(year),summarize,count=length(year))
+
+##印尼
+colnames(year_indo)[2] <- 'china_official'
+colnames(year_indo)[3] <- 'indo_positive'
+year_indo<-full_join(year_indo,yes_year)
+year_indo$percentage_all <- paste(round((as.numeric(year_indo$china_official) / as.numeric(year_indo$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_indo, "year_indo.csv", row.names = FALSE)
+
+no_indo <-filter(no,country=="印尼")
+no_indo_year<-ddply(no_indo,.(year),summarize,count=length(year))
+
+##泰國
+colnames(year_thailand)[2] <- 'china_official'
+colnames(year_thailand)[3] <- 'thai_positive'
+year_thailand<-full_join(year_thailand,yes_year)
+year_thailand$percentage_all <- paste(round((as.numeric(year_thailand$china_official) / as.numeric(year_thailand$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_thailand, "year_thailand.csv", row.names = FALSE)
+
+no_thailand <-filter(no,country=="泰國")
+no_thai_year<-ddply(no_thailand,.(year),summarize,count=length(year))
+
+##肯亞
+colnames(year_kenya)[2] <- 'china_official'
+colnames(year_kenya)[3] <- 'kenya_positive'
+year_kenya<-full_join(year_kenya,yes_year)
+year_kenya$percentage_all <- paste(round((as.numeric(year_kenya$china_official) / as.numeric(year_kenya$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_kenya, "year_kenya.csv", row.names = FALSE)
+
+no_kenya <-filter(no,country=="肯亞")
+no_kenya_year<-ddply(no_kenya,.(year),summarize,count=length(year))
+
+##塞內加爾
+colnames(year_senegal)[2] <- 'china_official'
+colnames(year_senegal)[3] <- 'senegal_positive'
+year_senegal<-full_join(year_senegal,yes_year)
+year_senegal$percentage_all <- paste(round((as.numeric(year_senegal$china_official) / as.numeric(year_senegal$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_senegal, "year_senegal.csv", row.names = FALSE)
+
+no_senegal <-filter(no,country=="塞內加爾")
+no_senegal_year<-ddply(no_senegal,.(year),summarize,count=length(year))
+
+##埃及
+colnames(year_egypt)[2] <- 'china_official'
+colnames(year_egypt)[3] <- 'egypt_positive'
+year_egypt<-full_join(year_egypt,yes_year)
+year_egypt$percentage_all <- paste(round((as.numeric(year_egypt$china_official) / as.numeric(year_egypt$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_egypt, "year_egypt.csv", row.names = FALSE)
+
+no_egypt <-filter(no,country=="埃及")
+no_egypt_year<-ddply(no_egypt,.(year),summarize,count=length(year))
+
+##緬甸
+colnames(year_myanmar)[2] <- 'china_official'
+colnames(year_myanmar)[3] <- 'myanmar_positive'
+year_myanmar<-full_join(year_myanmar,yes_year)
+year_myanmar$percentage_all <- paste(round((as.numeric(year_myanmar$china_official) / as.numeric(year_myanmar$all_count)) * 100, 1), "%", sep = "")
+write.csv(year_myanmar, "year_myanmar.csv", row.names = FALSE)
+
+no_myanmar <-filter(no,country=="緬甸")
+no_myanmar_year<-ddply(no_egypt,.(year),summarize,count=length(year))
+```
+```
+```
+
